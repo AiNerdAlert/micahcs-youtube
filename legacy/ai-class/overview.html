@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>overview - AI Summer Class</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: #2563eb;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            padding: 8px;
+        }
+        
+        .menu-btn span {
+            width: 24px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+        }
+        
+        .menu-btn:hover { background: #1d4ed8; }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: 0.3s;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 80px 20px 20px 20px;
+        }
+        
+        .sidebar.open { left: 0; }
+        
+        .sidebar h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 10px;
+            margin-top: 20px;
+        }
+        
+        .sidebar a {
+            display: block;
+            padding: 10px 15px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            transition: 0.2s;
+        }
+        
+        .sidebar a:hover {
+            background: #f0f0f0;
+            color: #2563eb;
+        }
+        
+        .sidebar a.active {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+        
+        .overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .content {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        h1 {
+            color: #2563eb;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        h2 {
+            color: #333;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #555;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+        
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 20px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        
+        hr {
+            border: none;
+            border-top: 2px solid #e5e7eb;
+            margin: 40px 0;
+        }
+        
+        strong {
+            color: #111;
+            font-weight: 600;
+        }
+        
+        a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .content { padding: 20px; }
+            h1 { font-size: 2em; }
+            h2 { font-size: 1.5em; }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-btn" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <div class="overlay" onclick="toggleMenu()"></div>
+    
+    <nav class="sidebar">
+        <a href="index.html">🏠 Home</a>
+        <h3>Working Documents</h3>
+        <a href="overview.html" class="active">📋 Project Overview</a>
+        <a href="curriculum.html" class="">📅 5-Day Curriculum</a>
+        <a href="innovation-history.html">🔄 Innovation &amp; Fear</a>
+        <a href="final-project.html" class="">🎯 Final Project</a>
+        <a href="exercises.html" class="">🏃 Physical Exercises</a>
+        <a href="chat-app.html" class="">💬 Custom Chat App</a>
+        <a href="showcase.html" class="">🎤 Parent Showcase</a>
+        <a href="forms.html" class="">📝 Forms & Agreements</a>
+        <a href="topics.html" class="">💡 Additional Topics</a>
+        <a href="platforms.html" class="">💻 Chromebook Platforms</a>
+        <a href="ideas.html" class="">🗂️ Ideas Backlog</a>
+    </nav>
+    
+    <div class="container">
+        <div class="content">
+            <p><h1>AI Summer STEM Class - Project Overview</h1></p><p><h2>Vision</h2>
+A 15-hour AI curriculum for kids (grades 5-8) where AI teaches AI — using avatars, voiceovers, and interactive media, with a human teacher facilitating physical exercises that make abstract AI concepts tangible.</p><p><h2>Constraints</h2>
+<ul><li><strong>Duration:</strong> 15 hours total (5 days × 3 hours/day, Monday-Friday)</li>
+<li><strong>Age group:</strong> Entering 5th-8th grade (~10-13 years old)</li>
+<li><strong>Teaching model:</strong> Digital content (videos/slides) handles knowledge transfer; human teacher leads physical exercises and ensures comprehension</li>
+<li><strong>Delivery:</strong> Mini website (likely) with all digital materials</li>
+<li><strong>Output:</strong> Teacher's guide + lesson materials + physical materials list</li></p><p><h2>Core Purpose</h2></p><p><strong>Frame AI as a TOOL</strong> — not magic, not scary. A tool to use effectively.</p><p><strong>Goal:</strong> Give kids practical AI literacy for their future. They will live in an AI-integrated world; teach them to use it well.</p><p><h2>Core Topics to Cover</h2></p><p><h3>1. Using AI as a Tool</h3>
+<li><strong>Prompting skills</strong> - How to give good instructions</li>
+<li><strong>Context & conversation</strong> - How context windows work</li>
+<li><strong>Different models</strong> - Capabilities, strengths, weaknesses</li>
+<li><strong>AI landscape</strong> - Companies, players (OpenAI, Anthropic, Google, Meta, etc.)</li>
+<li><strong>Running AI</strong> - On your computer vs in the cloud</li></p><p><h3>2. Robotics & Physical AI</h3>
+<li><strong>Humanoid robots</strong> - Tesla Optimus, Boston Dynamics Atlas, others</li>
+<li><strong>AI + Robots</strong> - How AI will power physical machines</li>
+<li><strong>Technical challenges</strong> - Compute, energy, materials</li>
+<li><strong>Edge vs Cloud</strong> - What runs on the robot vs remote</li>
+<li><strong>Timeline & Economics</strong> - When will families buy robots? How much? Lease/finance?</li>
+<li><strong>Current state</strong> - What works now, what's still developing</li></p><p><h3>3. Societal Impact & Future</h3>
+<li><strong>Job displacement</strong> - What's happening now, what might happen</li>
+<li><strong>Future of work</strong> - How AI changes careers</li>
+<li><strong>Expert perspectives</strong> - What leaders are saying</li>
+<li><strong>Address concerns</strong> - Real talk about fears and possibilities</li></p><p><h3>4. Hands-On Building</h3>
+<li><strong>Interact with AI</strong> - Direct use of models (TBD which ones)</li>
+<li><strong>Build something real</strong> - Website or web app</li>
+<li><strong>Deploy it</strong> - Make it live and usable</li>
+<li><strong>Chromebook-friendly</strong> - Must work on school computers</li>
+<li><strong>Class of 20-30</strong> - Scalable platform needed</li></p><p><h3>5. Foundational Concepts</h3>
+<li>Context windows & tokens</li>
+<li>How models are trained</li>
+<li>Model intelligence differences</li>
+<li>Reasoning and thinking</li>
+<li>Limitations and capabilities</li></p><p><h2>Philosophy (from Nerding)</h2>
+Digital content does the teaching → Human teacher does the facilitating.
+<li>Videos/slideshows deliver knowledge</li>
+<li>Teacher ensures understanding</li>
+<li>Teacher leads physical exercises and real-world examples</li>
+<li>Physical activities make abstract digital concepts visible</li></p><p><h2>Project Status</h2>
+🟡 <strong>In Progress</strong> - Brainstorming and organizing phase</p><p><h2>🌐 Web Interface</h2></p><p><strong>View this project online:</strong> https://micahcs.com/ai-class/</p><p>All working documents are accessible via hamburger menu (☰) on the website:
+<li>Read curriculum, exercises, forms, etc. from any device</li>
+<li>Review on phone/tablet when away from Mac mini</li>
+<li>Share links with collaborators</li>
+<li>Spark ideas while reading → give feedback → docs update</li></ul></p><p><strong>To update the website after editing markdown files:</strong>
+<pre><code>bash
+cd ~/www/micahcs.com/ai-class
+./update.sh
+</code></pre></p><p>The website auto-generates from these markdown files.</p><p><h2>Next Steps</h2>
+1. Brainstorm lesson topics
+2. Design physical exercises for each concept
+3. Define 5-day curriculum outline (3hrs/day breakdown)
+4. Choose output format (website structure, video tools, etc.)
+5. Create teacher's guide structure
+6. Build materials lists</p><p>---
+Last updated: 2026-02-05
+</p>
+        </div>
+    </div>
+    
+    <script>
+        function toggleMenu() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.querySelector('.overlay').classList.toggle('show');
+        }
+    </script>
+</body>
+</html>

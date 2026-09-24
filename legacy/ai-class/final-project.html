@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>final project - AI Summer Class</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: #2563eb;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            padding: 8px;
+        }
+        
+        .menu-btn span {
+            width: 24px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+        }
+        
+        .menu-btn:hover { background: #1d4ed8; }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: 0.3s;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 80px 20px 20px 20px;
+        }
+        
+        .sidebar.open { left: 0; }
+        
+        .sidebar h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 10px;
+            margin-top: 20px;
+        }
+        
+        .sidebar a {
+            display: block;
+            padding: 10px 15px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            transition: 0.2s;
+        }
+        
+        .sidebar a:hover {
+            background: #f0f0f0;
+            color: #2563eb;
+        }
+        
+        .sidebar a.active {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+        
+        .overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .content {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        h1 {
+            color: #2563eb;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        h2 {
+            color: #333;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #555;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+        
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 20px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        
+        hr {
+            border: none;
+            border-top: 2px solid #e5e7eb;
+            margin: 40px 0;
+        }
+        
+        strong {
+            color: #111;
+            font-weight: 600;
+        }
+        
+        a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .content { padding: 20px; }
+            h1 { font-size: 2em; }
+            h2 { font-size: 1.5em; }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-btn" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <div class="overlay" onclick="toggleMenu()"></div>
+    
+    <nav class="sidebar">
+        <a href="index.html">🏠 Home</a>
+        <h3>Working Documents</h3>
+        <a href="overview.html" class="">📋 Project Overview</a>
+        <a href="curriculum.html" class="">📅 5-Day Curriculum</a>
+        <a href="innovation-history.html">🔄 Innovation &amp; Fear</a>
+        <a href="final-project.html" class="active">🎯 Final Project</a>
+        <a href="exercises.html" class="">🏃 Physical Exercises</a>
+        <a href="chat-app.html" class="">💬 Custom Chat App</a>
+        <a href="showcase.html" class="">🎤 Parent Showcase</a>
+        <a href="forms.html" class="">📝 Forms & Agreements</a>
+        <a href="topics.html" class="">💡 Additional Topics</a>
+        <a href="platforms.html" class="">💻 Chromebook Platforms</a>
+        <a href="ideas.html" class="">🗂️ Ideas Backlog</a>
+    </nav>
+    
+    <div class="container">
+        <div class="content">
+            <p><h1>Final Project: Two-Part Showcase</h1></p><p><h2>Overview</h2>
+Students create TWO things for Friday's parent showcase:
+1. <strong>AI-Generated Presentation</strong> - About what they learned (meta!)
+2. <strong>Custom Web App</strong> - Solves a problem they care about</p><p>Both demonstrate AI literacy: using AI as a tool to amplify their own work.</p><p>---</p><p><h2>Part 1: AI-Generated Presentation</h2></p><p><h3>The Process (Built Throughout the Week)</h3></p><p>#### Daily Learning Capture
+<strong>When:</strong> Twice per day (before snack break + end of day)  
+<strong>Duration:</strong> 5-10 minutes each time  
+<strong>How:</strong> Students dictate/write what they learned so far</p><p><strong>Before snack break (~1.5 hours into class):</strong>
+> "Okay everyone, before snack, let's capture what we've learned this morning. I'm going to ask: 'What did you learn today?' and we'll go around the room. You can say one thing or multiple things. I'll record it."</p><p><strong>Teacher records (voice memo or typed notes):</strong>
+<ul><li>Student names + what they said</li>
+<li>Or: Students write on paper/digital doc</li>
+<li>Or: Voice recording transcribed later</li></p><p><strong>End of day (last 10 min):</strong>
+> "Before we wrap up, let's add to our learning log. What else did you learn this afternoon? What surprised you? What was hardest?"</p><p><strong>Capture daily for Monday-Thursday.</strong></p><p>---</p><p><h3>Friday: AI Transforms Notes into Presentation</h3></p><p><strong>Morning (first hour):</strong></p><p><strong>Step 1: Compile All Notes</strong>
+<li>Gather all daily learning captures (4 days × 2 sessions = 8 chunks)</li>
+<li>Create one big document with everything students said</li></p><p><strong>Step 2: Feed to AI</strong>
+Students work individually or in pairs:</p><p><strong>Prompt engineering lesson!</strong></p><p>> "Now you're going to use AI to turn your notes into a presentation. Here's what you need to tell the AI:
+> 
+> - What you want (a presentation about what you learned)
+> - Who the audience is (your parents)
+> - What style you want (informative, fun, impressive)
+> - What format (slides? paragraphs? bullet points?)
+> 
+> This is where your prompting skills matter!"</p><p><strong>Example student prompt:</strong>
+> "I attended an AI summer class this week. Here are my notes about what I learned each day: [paste notes]. Please create a 5-minute presentation for my parents that explains what I learned in a way that's impressive and easy to understand. Organize it by day or by topic, whichever makes more sense. Make it sound like me (a 6th grader), not too formal."</p><p><strong>Step 3: AI Generates Draft</strong>
+<li>AI creates presentation outline</li>
+<li>AI writes content for each section</li>
+<li>Students review and customize</li></p><p><strong>Step 4: Add Visuals</strong>
+<li>Students identify where images would help</li>
+<li>Use AI image generation (DALL-E, Midjourney, Nano Banana Pro, etc.)</li>
+<li>Prompt AI to create diagrams, illustrations, icons</li></p><p><strong>Example visual prompts:</strong>
+<li>"Create a simple diagram showing how a context window fills up"</li>
+<li>"Generate an image of a friendly robot teaching kids"</li>
+<li>"Make an infographic comparing human vs AI strengths"</li></p><p><strong>Step 5: Build Slides</strong>
+<li>Use Google Slides, PowerPoint, or web-based tool</li>
+<li>Insert AI-generated text + images</li>
+<li>Customize colors, fonts, layout</li>
+<li>Add transitions (if time)</li></p><p><strong>Step 6: Practice</strong>
+<li>Students rehearse their 2-3 minute presentations</li>
+<li>Peer feedback</li>
+<li>Final tweaks</li></p><p>---</p><p><h3>Why This Is Brilliant</h3></p><p><strong>Skills demonstrated:</strong>
+✅ <strong>Prompt engineering</strong> - Giving AI clear instructions  
+✅ <strong>Context setting</strong> - Explaining what you need  
+✅ <strong>Synthesis</strong> - Turning raw notes into polished content  
+✅ <strong>Visual communication</strong> - Using images to enhance message  
+✅ <strong>Critical thinking</strong> - Reviewing AI output, not blindly accepting  
+✅ <strong>Iteration</strong> - Refining prompts to get better results  </p><p><strong>Meta learning:</strong>
+<li>Students use AI to present about learning AI</li>
+<li>Parents see the ENTIRE process (notes → AI → presentation)</li>
+<li>Demonstrates AI as tool, not cheating</li>
+<li>Shows planning + execution workflow</li></p><p><strong>Parent-friendly:</strong>
+<li>Parents understand the content (it's what their kid learned!)</li>
+<li>Impressive technical execution</li>
+<li>Clear demonstration of skills gained</li>
+<li>Easy to explain: "I used AI to help organize my thoughts"</li></p><p>---</p><p><h2>Part 2: Custom Web App</h2></p><p><h3>The Challenge</h3>
+<strong>Build a web app that solves a problem YOU care about.</strong></p><p><h3>Constraints (TBD based on time/skill):</h3>
+<li>Must be web-based (Chromebook-compatible)</li>
+<li>Must use AI in some way (chatbot, image gen, search, etc.)</li>
+<li>Must solve a real problem or serve a real interest</li>
+<li>Must deploy (live URL to share)</li></p><p><h3>The Process (Spread Across Week)</h3></p><p>#### Day 1-2: Brainstorm & Plan
+<strong>Students identify:</strong>
+<li>What problem do I want to solve?</li>
+<li>What interests me?</li>
+<li>What would be useful/fun to build?</li></p><p><strong>Examples:</strong>
+<li>"I always forget my homework → Homework reminder app"</li>
+<li>"I love animals → Animal fact chatbot"</li>
+<li>"I want to learn Spanish → Vocabulary quiz game"</li>
+<li>"I'm into space → Planet explorer with AI facts"</li>
+<li>"I hate deciding what to eat → Meal suggestion app"</li></p><p><strong>Brainstorm WITH AI:</strong>
+Students practice prompting AI to help them brainstorm:</p><p>> "I want to build a web app but I'm not sure what. I like [interests]. What are some simple app ideas I could build in a few hours?"</p><p><strong>AI helps generate ideas, students choose one.</strong></p><p>---</p><p>#### Day 3: Planning & Design</p><p><strong>Students create planning documents:</strong></p><p><strong>1. App description</strong>
+<li>What does it do?</li>
+<li>Who is it for?</li>
+<li>What problem does it solve?</li></p><p><strong>2. Features list</strong>
+<li>What can users do?</li>
+<li>What pages/screens does it have?</li>
+<li>What inputs/outputs?</li></p><p><strong>3. Technical plan</strong>
+<li>What AI model will I use? (ChatGPT API? Image generation?)</li>
+<li>What will the interface look like?</li>
+<li>What do I need to learn?</li></p><p><strong>This is the VALUABLE part: planning before coding.</strong></p><p><strong>Teacher emphasizes:</strong>
+> "Professional developers spend MORE time planning than coding. The better your plan, the easier coding will be. AI can only help you if you know what you want!"</p><p><strong>Document everything:</strong>
+<li>Sketch UI on paper</li>
+<li>Write feature descriptions</li>
+<li>List technical requirements</li></p><p><strong>Feed plan to AI:</strong>
+> "I want to build [app description]. Here are my features: [list]. Here's a sketch of my interface: [describe]. Can you help me plan the technical structure? What HTML/CSS/JS will I need?"</p><p>---</p><p>#### Day 4: Build & Debug</p><p><strong>Students use AI-assisted coding:</strong></p><p><strong>Platform:</strong> Replit, Glitch, or similar (Chromebook-friendly)</p><p><strong>Workflow:</strong>
+1. <strong>Start with template</strong> (teacher-provided or AI-generated)
+2. <strong>Add features one at a time</strong>
+3. <strong>Prompt AI for code</strong> when stuck
+4. <strong>Test frequently</strong>
+5. <strong>Debug with AI's help</strong></p><p><strong>Example prompts:</strong>
+> "I want to add a text input box where users can type a question. Can you show me the HTML for that?"</p><p>> "This button isn't working. Here's my code: [paste]. What's wrong?"</p><p>> "How do I connect this form to the ChatGPT API so it sends the user's question and displays the answer?"</p><p><strong>Teacher circulates:</strong>
+<li>Help students debug</li>
+<li>Guide prompt engineering</li>
+<li>Ensure progress (scope down if needed)</li></p><p><strong>Key lesson:</strong>
+> "It's okay if your app isn't perfect. Real developers iterate. What matters is that it WORKS and you understand what it does."</p><p>---</p><p>#### Day 5 (Morning): Polish & Deploy</p><p><strong>Final touches:</strong>
+<li>Test all features</li>
+<li>Fix bugs</li>
+<li>Improve design (colors, fonts, layout)</li>
+<li>Add title/instructions</li>
+<li>Deploy (get live URL)</li></p><p><strong>Deploy workflow:</strong>
+<li>Replit: One-click deploy, instant URL</li>
+<li>Glitch: Auto-deploys, get shareable link</li>
+<li>Students copy their URL to share with parents</li></p><p><strong>Create app "demo script":</strong>
+<li>What does your app do?</li>
+<li>What problem does it solve?</li>
+<li>How do you use it?</li>
+<li>What was hardest to build?</li>
+<li>How did AI help you?</li></p><p>---</p><p><h3>Why This Is Powerful</h3></p><p><strong>Skills demonstrated:</strong>
+✅ <strong>Problem identification</strong> - Finding real needs  
+✅ <strong>Planning</strong> - Thinking before building  
+✅ <strong>Communication with AI</strong> - Clear instructions = better code  
+✅ <strong>Context setting</strong> - Giving AI enough info to help  
+✅ <strong>Debugging</strong> - Finding and fixing errors  
+✅ <strong>Iteration</strong> - Testing, tweaking, improving  
+✅ <strong>Collaboration</strong> - Human + AI working together  </p><p><strong>Cognitive development:</strong>
+<li>Planning skills (executive function)</li>
+<li>Problem decomposition (breaking big task into small steps)</li>
+<li>Logical thinking (if-then reasoning)</li>
+<li>Resilience (debugging requires persistence)</li>
+<li>Communication (explaining clearly to AI)</li></p><p><strong>Parent-friendly:</strong>
+<li>Impressive visible result (working app!)</li>
+<li>Personally meaningful (kid chose the problem)</li>
+<li>Demonstrates independence (kid drove the project)</li>
+<li>Clear AI role (tool, not magic)</li></p><p>---</p><p><h2>Showcase Presentation Structure</h2></p><p><h3>Each Student Gets ~3-4 Minutes</h3></p><p><strong>Part 1: AI-Generated Presentation (1.5 min)</strong>
+<li>"Here's what I learned this week..."</li>
+<li>Show slides</li>
+<li>Explain: "I used AI to organize my notes into this presentation"</li></p><p><strong>Part 2: Web App Demo (1.5 min)</strong>
+<li>"I built an app that [solves problem]"</li>
+<li>Live demo (show it working!)</li>
+<li>Explain: "AI helped me write the code, but I had to plan it and debug it"</li></p><p><strong>Part 3: Q&A (30 sec)</strong>
+<li>Parents can ask quick question</li>
+<li>Or: Gallery walk (parents explore apps at stations)</li></p><p>---</p><p><h2>Logistics for Friday Showcase</h2></p><p><h3>Option A: Individual Presentations</h3>
+<li>20-30 kids × 3 min = 60-90 minutes (too long!)</li>
+<li><strong>Solution:</strong> Select 5-10 students to present, others do gallery walk</li></p><p><h3>Option B: Gallery Walk</h3>
+<li>Students at stations with their apps open</li>
+<li>Parents circulate, kids demo 1-on-1</li>
+<li>Slides displayed on laptop or printed handout</li>
+<li><strong>Advantage:</strong> Everyone participates, more personal</li></p><p><h3>Option C: Hybrid</h3>
+<li>Selected highlights present to whole group (3-5 kids)</li>
+<li>Then gallery walk for everyone else</li>
+<li><strong>Advantage:</strong> Best of both (impressive demos + everyone included)</li></p><p>---</p><p><h2>Assessment Rubric (Optional)</h2></p><p><h3>Presentation</h3>
+<li>☐ Used AI to generate content from notes</li>
+<li>☐ Included visuals (AI-generated or sourced)</li>
+<li>☐ Organized and easy to follow</li>
+<li>☐ Demonstrated understanding of what they learned</li></p><p><h3>Web App</h3>
+<li>☐ Solves a real problem or serves an interest</li>
+<li>☐ Works (functional, deployed)</li>
+<li>☐ Uses AI in some way</li>
+<li>☐ Demonstrates planning (not just random coding)</li>
+<li>☐ Student can explain how it works</li></p><p><h3>Process</h3>
+<li>☐ Documented learning daily</li>
+<li>☐ Planned before building</li>
+<li>☐ Debugged and iterated</li>
+<li>☐ Used AI as a tool (not crutch)</li>
+<li>☐ Can articulate what AI helped with vs what they did</li></p><p>---</p><p><h2>Materials Needed</h2></p><p><strong>For presentations:</strong>
+<li>☐ Computers with internet (Google Slides or similar)</li>
+<li>☐ AI access (ChatGPT, Claude, etc.)</li>
+<li>☐ Image generation tool access</li>
+<li>☐ Projector for showcase (or printed handouts)</li></p><p><strong>For web apps:</strong>
+<li>☐ Chromebooks (one per student)</li>
+<li>☐ Replit/Glitch accounts (created ahead)</li>
+<li>☐ AI code assistant access (Replit AI, ChatGPT, etc.)</li>
+<li>☐ Teacher-provided starter templates</li>
+<li>☐ Backup plan if APIs fail (local version)</li></ul></p><p>---</p><p><h2>Time Allocation (Across Week)</h2></p><p>| Day | Time | Activity |
+|-----|------|----------|
+| Mon-Thu | 5 min × 2/day | Learning capture (notes) |
+| Mon-Tue | ~30 min/day | App brainstorming & planning |
+| Wed | ~1 hour | Planning documents & design |
+| Thu | ~2 hours | Building & debugging |
+| Fri AM | ~1 hour | Polish apps + deploy |
+| Fri AM | ~1.5 hours | Generate presentations with AI |
+| Fri AM | 30 min | Rehearse |
+| Fri PM | 45 min | Showcase! |</p><p>---</p><p><h2>Teacher Talking Points</h2></p><p><strong>When explaining the project:</strong>
+> "You're going to create TWO things this week. First, you'll use AI to turn your daily notes into an awesome presentation. Second, you'll build a real web app that solves a problem YOU care about. AI will help, but YOU are in charge. This is how professionals use AI: as a powerful tool that makes them faster and better."</p><p><strong>During the showcase:</strong>
+> "These students didn't just learn ABOUT AI—they learned to USE it. They planned, built, debugged, and deployed real projects. The apps you see are 100% functional. The presentations were created WITH AI, not BY AI. These kids are the ones who told AI what to do. That's the skill that matters."</p><p>---</p><p><strong>Status:</strong> ✅ Concept fully defined, ready to build into curriculum</p><p><strong>Created:</strong> 2026-02-05</p><p><strong>Next Steps:</strong>
+1. Test AI report generation workflow (mock notes → AI → presentation)
+2. Create app starter templates for different skill levels
+3. Test platforms on Chromebooks (Replit, Glitch, etc.)
+4. Write detailed teacher facilitation guide
+5. Create example projects to show students
+</p>
+        </div>
+    </div>
+    
+    <script>
+        function toggleMenu() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.querySelector('.overlay').classList.toggle('show');
+        }
+    </script>
+</body>
+</html>

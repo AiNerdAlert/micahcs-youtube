@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ideas - AI Summer Class</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: #2563eb;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            padding: 8px;
+        }
+        
+        .menu-btn span {
+            width: 24px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+        }
+        
+        .menu-btn:hover { background: #1d4ed8; }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: 0.3s;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 80px 20px 20px 20px;
+        }
+        
+        .sidebar.open { left: 0; }
+        
+        .sidebar h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 10px;
+            margin-top: 20px;
+        }
+        
+        .sidebar a {
+            display: block;
+            padding: 10px 15px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            transition: 0.2s;
+        }
+        
+        .sidebar a:hover {
+            background: #f0f0f0;
+            color: #2563eb;
+        }
+        
+        .sidebar a.active {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+        
+        .overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .content {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        h1 {
+            color: #2563eb;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        h2 {
+            color: #333;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #555;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+        
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 20px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        
+        hr {
+            border: none;
+            border-top: 2px solid #e5e7eb;
+            margin: 40px 0;
+        }
+        
+        strong {
+            color: #111;
+            font-weight: 600;
+        }
+        
+        a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .content { padding: 20px; }
+            h1 { font-size: 2em; }
+            h2 { font-size: 1.5em; }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-btn" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <div class="overlay" onclick="toggleMenu()"></div>
+    
+    <nav class="sidebar">
+        <a href="index.html">🏠 Home</a>
+        <h3>Working Documents</h3>
+        <a href="overview.html" class="">📋 Project Overview</a>
+        <a href="curriculum.html" class="">📅 5-Day Curriculum</a>
+        <a href="innovation-history.html">🔄 Innovation &amp; Fear</a>
+        <a href="final-project.html" class="">🎯 Final Project</a>
+        <a href="exercises.html" class="">🏃 Physical Exercises</a>
+        <a href="chat-app.html" class="">💬 Custom Chat App</a>
+        <a href="showcase.html" class="">🎤 Parent Showcase</a>
+        <a href="forms.html" class="">📝 Forms & Agreements</a>
+        <a href="topics.html" class="">💡 Additional Topics</a>
+        <a href="platforms.html" class="">💻 Chromebook Platforms</a>
+        <a href="ideas.html" class="active">🗂️ Ideas Backlog</a>
+    </nav>
+    
+    <div class="container">
+        <div class="content">
+            <p><h1>Ideas Backlog</h1></p><p>Random ideas captured during brainstorming. Not yet organized into lessons.</p><p><h2>📚 Resources to Review</h2></p><p><em>Links to visit and potentially pull into curriculum:</em></p><p><ul>
+<li><a href="https://cs230.stanford.edu/syllabus/fall_2025/7/lecture_7.pdf" target="_blank">Stanford CS230 — Lecture 7 (Fall 2025)</a> — Deep Learning course lecture PDF</li>
+<li><a href="https://www.youtube.com/watch?v=E1ytrEBe34I" target="_blank">YouTube: E1ytrEBe34I</a></li>
+</ul></p><p><h2>Physical Exercises</h2></p><p><h3>Context Window Table Exercise</h3>
+<strong>Concept:</strong> Visual demonstration of context window limits and summarization</p><p><strong>Setup:</strong>
+<ul><li>Table length = context window (e.g., 200,000 tokens)</li>
+<li>Kids write on pieces of paper</li>
+<li>Each new piece gets pushed forward on the table</li>
+<li>Papers stack up and eventually fall off the end</li></p><p><strong>Teaching moment:</strong>
+<li>Shows how context fills up</li>
+<li>Demonstrates why messages "fall off"</li>
+<li>Introduces summarization: compress all papers into one smaller summary paper</li>
+<li>Clears context window to continue</li></p><p><strong>Grade level:</strong> 5-8</p><p>---</p><p><h3>Peanut Butter Sandwich Variation</h3>
+<strong>Concept:</strong> Clear instructions and prompting</p><p><strong>Original:</strong> Person has bread, PB, knife. You must instruct them step-by-step to make a PB sandwich (they follow literally).</p><p><strong>Need:</strong> Create a new AI-themed variation on this classic exercise</p><p>---</p><p><h3>Humans vs AI Comparison Exercise</h3>
+<strong>Concept:</strong> What are humans good at? What is AI good at?</p><p><strong>Topics to cover:</strong>
+<li><strong>AI strengths:</strong> Speed (reading, typing, processing), pattern recognition, data analysis, consistency</li>
+<li><strong>AI weaknesses:</strong> True creativity, emotional intelligence, common sense, physical interaction</li>
+<li><strong>Human strengths:</strong> Creativity, empathy, adaptability, learning from few examples, ethical reasoning</li>
+<li><strong>Human weaknesses:</strong> Slow processing, inconsistent, gets tired, limited memory</li></p><p><strong>Speed demonstration:</strong>
+<li>How fast can AI "read" vs human? (magnitudes faster)</li>
+<li>How fast can AI type vs human?</li>
+<li>Real-time comparison?</li></p><p><strong>Superhumans to discuss:</strong>
+<li>Speed readers (Kim Peek, savants)</li>
+<li>Chess/Go grandmasters</li>
+<li>Mental calculators</li>
+<li>What amazing things can humans do that we thought only AI could?</li></p><p><strong>Future discussion:</strong>
+<li>Human augmentation (Neuralink)</li>
+<li>Will humans need to augment to keep up?</li>
+<li>Is that desirable? Ethical?</li></p><p>---</p><p><h3>Multimodal AI Hands-On</h3>
+<strong>Music generation:</strong> Suno (Micah uses this a lot - fun songs!)
+<strong>Image generation:</strong> Nano Banana Pro, OpenAI DALL-E, others
+<strong>Speech-to-text & Text-to-speech:</strong> ElevenLabs demo
+<strong>Video generation:</strong> Multiple companies, use cases</p><p>Let kids CREATE with these during class:
+<li>Generate images for their projects</li>
+<li>Create music or sound effects</li>
+<li>Generate videos</li>
+<li>Use voice cloning or TTS</li></p><p>---</p><p><h2>Lesson Topics (not yet fleshed out)</h2></p><p><h3>Using AI Effectively</h3>
+<li>Prompting skills & instruction giving</li>
+<li>Context windows & how to work with them</li>
+<li>Tokens explained</li>
+<li>Different model capabilities (GPT vs Claude vs Gemini vs local)</li>
+<li>AI companies & landscape (OpenAI, Anthropic, Google, Meta, etc.)</li>
+<li>Running AI locally vs cloud</li></p><p><h3>Robotics & Physical AI</h3>
+<li>Humanoid robots: Tesla Optimus</li>
+<li>Humanoid robots: Boston Dynamics Atlas</li>
+<li>Other robotics companies</li>
+<li>How AI integrates with robots</li>
+<li>Early struggles in robotics development</li>
+<li>Technical challenges: compute power on robots</li>
+<li>Technical challenges: energy & materials</li>
+<li>Edge AI vs Cloud AI for robots</li>
+<li>When will families have home robots? (timelines)</li>
+<li>Robot economics: cost, leasing, financing</li></p><p><h3>AI & Society</h3>
+<li>Job displacement: current impact</li>
+<li>Job displacement: future projections</li>
+<li>Future of work with AI</li>
+<li>What leading experts are saying</li>
+<li>Addressing fears & concerns</li></p><p><h3>Hands-On Projects</h3>
+<li>Interacting with AI models (which ones? how?)</li>
+<li>Building a website or web app</li>
+<li>Deploying to production</li>
+<li>Chromebook-compatible tools</li>
+<li>Scalable for 20-30 students</li></p><p><h3>Foundational Concepts</h3>
+<li>How models are trained</li>
+<li>Model intelligence differences</li>
+<li>How AI reasons and thinks</li>
+<li>Limitations of current AI</li>
+<li>Capabilities of current AI</li></p><p>---</p><p><h2>Real-World Examples to Share</h2></p><p><h3>Tesla Full Self-Driving (Micah's Experience)</h3>
+<li><strong>Micah drives:</strong> 2021 Tesla Model S Plaid with FSD subscription</li>
+<li><strong>Niecy drives:</strong> 2026 Tesla Model Y Juniper with FSD subscription</li>
+<li>Both subscribe to FSD and use it regularly</li>
+<li><strong>Lesson idea:</strong> Show video of FSD in action, discuss how it works</li>
+<li>Talk about levels of autonomy, what works well, what doesn't yet</li>
+<li>Relate to AI decision-making, computer vision, real-time processing</li></p><p><h3>Environmental Impact Discussion</h3>
+<li><strong>Data centers:</strong> Massive facilities needed for AI</li>
+<li><strong>Resource use:</strong> Water, electricity, land</li>
+<li><strong>Community impact:</strong> Noise, heat, land displacement, nature impact</li>
+<li><strong>Benefits:</strong> Efficiency gains, renewable energy optimization, scientific breakthroughs</li>
+<li><strong>Balance:</strong> AI has costs AND benefits — discuss both honestly</li></p><p><h3>Career Discussion: Jobs Changing</h3>
+<li><strong>Old model:</strong> 20 people doing a job at a company</li>
+<li><strong>New model:</strong> 1-2 people with AI doing the same job</li>
+<li><strong>Not just elimination:</strong> Job transformation</li>
+<li><strong>New jobs created:</strong> AI trainers, prompt engineers, AI safety researchers</li>
+<li><strong>Skills that matter:</strong> Adaptability, AI literacy, creativity, critical thinking</li></p><p>---</p><p><h2>Platforms to Evaluate</h2></p><p><strong>For building student projects (Chromebook-compatible):</strong></p><p><h3>Currently Recommended: Replit</h3>
+<li>Browser-based, AI-assisted coding, instant deploy</li>
+<li>(See chromebook-platforms.md for full analysis)</li></p><p><h3>Also Check Out:</h3>
+<li><strong>Google IDX</strong> - Google's new browser-based dev environment (Micah mentioned "Antigravity"?)</li>
+<li><strong>Lovable</strong> - AI-powered app builder (need to research)</li>
+<li><strong>Bolt</strong> - Another AI dev tool (need to research)</li>
+<li><strong>Glitch</strong> - Web app builder (already documented)</li>
+<li><strong>Google Colab</strong> - Python notebooks (already documented)</li></p><p><strong>Action:</strong> Test these platforms on actual Chromebooks before deciding</p><p>---</p><p><h2>Marketing Materials</h2></p><p><h3>Tagline (approved by Micah!)</h3>
+<strong>"AI Literacy for the Next Generation: Teaching Kids to Use the Tool That Will Define Their Future"</strong></p><p>Use this for:
+<li>Class description</li>
+<li>Registration page</li>
+<li>Parent communications</li>
+<li>Social media promotion</li>
+<li>Showcase materials</li></p><p>---</p><p><h2>Output Format Ideas</h2>
+<li>Mini website (likely choice)</li>
+<li>Videos with AI avatars</li>
+<li>Voiceover slideshows</li>
+<li>Interactive elements?</li></ul></p><p>---</p><p><em>Add ideas here as they come up during chats!</em>
+</p>
+        </div>
+    </div>
+    
+    <script>
+        function toggleMenu() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.querySelector('.overlay').classList.toggle('show');
+        }
+    </script>
+</body>
+</html>

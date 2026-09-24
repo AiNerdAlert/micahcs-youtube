@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chat app - AI Summer Class</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: #2563eb;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            padding: 8px;
+        }
+        
+        .menu-btn span {
+            width: 24px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+        }
+        
+        .menu-btn:hover { background: #1d4ed8; }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: 0.3s;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 80px 20px 20px 20px;
+        }
+        
+        .sidebar.open { left: 0; }
+        
+        .sidebar h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 10px;
+            margin-top: 20px;
+        }
+        
+        .sidebar a {
+            display: block;
+            padding: 10px 15px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            transition: 0.2s;
+        }
+        
+        .sidebar a:hover {
+            background: #f0f0f0;
+            color: #2563eb;
+        }
+        
+        .sidebar a.active {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+        
+        .overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .content {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        h1 {
+            color: #2563eb;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        h2 {
+            color: #333;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #555;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+        
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 20px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        
+        hr {
+            border: none;
+            border-top: 2px solid #e5e7eb;
+            margin: 40px 0;
+        }
+        
+        strong {
+            color: #111;
+            font-weight: 600;
+        }
+        
+        a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .content { padding: 20px; }
+            h1 { font-size: 2em; }
+            h2 { font-size: 1.5em; }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-btn" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <div class="overlay" onclick="toggleMenu()"></div>
+    
+    <nav class="sidebar">
+        <a href="index.html">🏠 Home</a>
+        <h3>Working Documents</h3>
+        <a href="overview.html" class="">📋 Project Overview</a>
+        <a href="curriculum.html" class="">📅 5-Day Curriculum</a>
+        <a href="innovation-history.html">🔄 Innovation &amp; Fear</a>
+        <a href="final-project.html" class="">🎯 Final Project</a>
+        <a href="exercises.html" class="">🏃 Physical Exercises</a>
+        <a href="chat-app.html" class="active">💬 Custom Chat App</a>
+        <a href="showcase.html" class="">🎤 Parent Showcase</a>
+        <a href="forms.html" class="">📝 Forms & Agreements</a>
+        <a href="topics.html" class="">💡 Additional Topics</a>
+        <a href="platforms.html" class="">💻 Chromebook Platforms</a>
+        <a href="ideas.html" class="">🗂️ Ideas Backlog</a>
+    </nav>
+    
+    <div class="container">
+        <div class="content">
+            <p><h1>Custom Chat Application for Class</h1></p><p><h2>Concept</h2>
+Build a web app that connects to multiple AI APIs (ChatGPT, Claude, Gemini, etc.) so students can safely interact with AI under supervision.</p><p><h2>Why This Is Better Than Direct Access</h2></p><p><strong>Safety & Monitoring:</strong>
+<ul><li>✅ Students create accounts on YOUR app (not OpenAI/Anthropic)</li>
+<li>✅ Admin dashboard shows all prompts & responses</li>
+<li>✅ Teacher can monitor in real-time</li>
+<li>✅ Filter inappropriate content before it reaches AI</li>
+<li>✅ No credit card needed (you control API keys)</li>
+<li>✅ No data leaked to AI companies (you're the proxy)</li></p><p><strong>Teaching Opportunities:</strong>
+<li>✅ Show moderation layers in action (how prompts are checked)</li>
+<li>✅ Demonstrate memory & preferences</li>
+<li>✅ Compare models side-by-side</li>
+<li>✅ Expose underlying terminology (inference, context, tokens, etc.)</li>
+<li>✅ Build exactly the interface you want (customized for learning)</li></p><p><strong>Control:</strong>
+<li>✅ Rate limiting (prevent spam)</li>
+<li>✅ Usage tracking (cost management)</li>
+<li>✅ Custom features (e.g., "explain this in kid terms" button)</li>
+<li>✅ Save chat history for student portfolios</li>
+<li>✅ Classroom mode (teacher broadcasts prompt to all students)</li></p><p>---</p><p><h2>Architecture</h2></p><p><h3>Frontend (Student-Facing)</h3>
+<pre><code>
+┌─────────────────────────────────┐
+│  Student Chat Interface         │
+│  - Text input box               │
+│  - Model selector dropdown      │
+│  - Chat history                 │
+│  - "Clear context" button       │
+│  - Token counter (live)         │
+│  - "Explain" mode toggle        │
+└─────────────────────────────────┘
+</code></pre></p><p><h3>Backend (Your Server)</h3>
+<pre><code>
+Student → Your App → Moderation Check → AI API
+                      ↓
+                   Log to DB
+                      ↓
+              Admin Dashboard
+</code></pre></p><p><h3>Admin Dashboard</h3>
+<pre><code>
+┌─────────────────────────────────┐
+│  Real-Time Monitoring           │
+│  - All active chats (live)      │
+│  - Prompt history per student   │
+│  - Flagged content alerts       │
+│  - Usage stats (tokens/cost)    │
+│  - Model performance comparison │
+└─────────────────────────────────┘
+</code></pre></p><p>---</p><p><h2>Features to Build</h2></p><p><h3>Student Features</h3>
+<li>☐ Account creation (username + password, no email needed)</li>
+<li>☐ Model selector (ChatGPT, Claude, Gemini, etc.)</li>
+<li>☐ Chat interface (looks like ChatGPT/Claude)</li>
+<li>☐ Chat history (saved per student)</li>
+<li>☐ Clear context button (restart conversation)</li>
+<li>☐ Token counter (shows context filling up)</li>
+<li>☐ Settings: temperature, max tokens, system prompt</li>
+<li>☐ "Compare models" mode (send same prompt to multiple AIs)</li></p><p><h3>Safety Features</h3>
+<li>☐ Content moderation (check prompts before sending)</li>
+<li>☐ Profanity filter</li>
+<li>☐ PII detection (don't send personal info to AI)</li>
+<li>☐ Rate limiting (max prompts per minute)</li>
+<li>☐ Blocked keywords list (teacher configurable)</li>
+<li>☐ Auto-flag suspicious prompts for teacher review</li></p><p><h3>Admin Features</h3>
+<li>☐ Dashboard: all students, all chats, real-time</li>
+<li>☐ Usage stats (tokens used, cost per student, per model)</li>
+<li>☐ Flagged content queue</li>
+<li>☐ Export chat histories (for grading/review)</li>
+<li>☐ Classroom broadcast (send same prompt to all students)</li>
+<li>☐ Model comparison view (which model gives best answers?)</li></p><p><h3>Teaching Features</h3>
+<li>☐ "Show moderation layer" toggle (students see what gets filtered)</li>
+<li>☐ "Explain tokens" mode (highlight tokens in real-time)</li>
+<li>☐ "Show system prompt" (reveal hidden instructions)</li>
+<li>☐ Side-by-side model comparison</li>
+<li>☐ Prompt improvement suggestions (AI helps write better prompts)</li></p><p>---</p><p><h2>Tech Stack Suggestions</h2></p><p><h3>Frontend</h3>
+<li><strong>React</strong> or <strong>Next.js</strong> (modern, easy to build chat UIs)</li>
+<li><strong>Tailwind CSS</strong> (styling)</li>
+<li><strong>WebSocket</strong> (real-time updates for admin dashboard)</li></p><p><h3>Backend</h3>
+<li><strong>Node.js + Express</strong> (simple API server)</li>
+<li><strong>PostgreSQL</strong> or <strong>SQLite</strong> (store users, chats, logs)</li>
+<li><strong>Redis</strong> (rate limiting, caching)</li></p><p><h3>AI APIs</h3>
+<li><strong>OpenAI API</strong> (GPT-4, GPT-3.5)</li>
+<li><strong>Anthropic API</strong> (Claude)</li>
+<li><strong>Google Gemini API</strong></li>
+<li><strong>Local models</strong> (Ollama for offline mode?)</li></p><p><h3>Hosting</h3>
+<li><strong>Vercel</strong> or <strong>Netlify</strong> (frontend)</li>
+<li><strong>Railway</strong> or <strong>Fly.io</strong> (backend)</li>
+<li>Or: <strong>All on Mac mini</strong> (local hosting for class only)</li></p><p>---</p><p><h2>Teaching Moments Built Into App</h2></p><p><h3>1. Moderation Layer</h3>
+<strong>Show students:</strong>
+> "When you send a prompt to ChatGPT, it doesn't go directly to the AI. First, a moderation AI checks if your prompt is safe. Let's see what gets flagged..."</p><p><strong>Your app can:</strong>
+<li>Display moderation results before sending to main AI</li>
+<li>Show what keywords trigger flags</li>
+<li>Explain why certain prompts are blocked</li></p><p><h3>2. Context Window Visual</h3>
+<strong>Show students:</strong>
+> "Look at the token counter! Every message you send uses tokens. When the bar fills up, old messages 'fall off.' That's the context window!"</p><p><strong>Your app can:</strong>
+<li>Live token counter (updates with each message)</li>
+<li>Visual bar showing context fullness</li>
+<li>Warning when approaching limit</li>
+<li>"Summarize & clear" button (like compaction)</li></p><p><h3>3. Model Comparison</h3>
+<strong>Show students:</strong>
+> "Let's send the same prompt to ChatGPT, Claude, and Gemini. Which one gives the best answer? Why?"</p><p><strong>Your app can:</strong>
+<li>Side-by-side view of responses</li>
+<li>Voting system (which answer is best?)</li>
+<li>Show differences in style, accuracy, creativity</li></p><p><h3>4. System Prompts</h3>
+<strong>Show students:</strong>
+> "Every AI chatbot has hidden instructions called a 'system prompt.' Let's see what ChatGPT is secretly told before you even talk to it."</p><p><strong>Your app can:</strong>
+<li>Toggle to reveal system prompts</li>
+<li>Let students edit system prompts (change AI's personality)</li>
+<li>Compare how system prompts change behavior</li></p><p><h3>5. Temperature & Settings</h3>
+<strong>Show students:</strong>
+> "Temperature controls how 'creative' the AI is. Low = boring but accurate. High = wild and unpredictable. Let's experiment!"</p><p><strong>Your app can:</strong>
+<li>Sliders for temperature, max tokens, top-p</li>
+<li>Real-time comparison (same prompt, different settings)</li>
+<li>Explain what each setting does</li></p><p>---</p><p><h2>Terminology to Cover in Curriculum</h2></p><p><h3>Core Concepts</h3></p><p><strong>Model</strong>
+<li>The AI "brain" (e.g., GPT-4, Claude 3.5)</li>
+<li>Trained on tons of text data</li>
+<li>Different models = different capabilities</li></p><p><strong>Inference</strong>
+<li>The process of AI generating a response</li>
+<li>"Running inference" = asking the AI a question and getting an answer</li>
+<li>Costs compute power (measured in tokens)</li></p><p><strong>Context Window</strong>
+<li>How much conversation the AI can "remember" at once</li>
+<li>Measured in tokens (e.g., 200k tokens = ~150k words)</li>
+<li>Old messages "fall off" when full</li>
+<li>Why long chats lose memory</li></p><p><strong>Tokens</strong>
+<li>How AI reads text (chunks, not letters)</li>
+<li>~1 token ≈ 4 characters or 0.75 words</li>
+<li>Both input AND output count toward limits</li>
+<li>Used to measure cost (API pricing per token)</li></p><p><strong>System Prompt</strong>
+<li>Hidden instructions given to AI before you chat</li>
+<li>Sets personality, rules, format</li>
+<li>Example: "You are a helpful assistant. Be concise."</li>
+<li>Users usually don't see this</li></p><p><strong>User Prompt / User Message</strong>
+<li>What YOU type to the AI</li>
+<li>The input you give</li>
+<li>Also called "query" or "instruction"</li></p><p><strong>Assistant Response</strong>
+<li>What the AI replies with</li>
+<li>The output generated</li>
+<li>Can be text, code, structured data, etc.</li></p><p><strong>Temperature</strong>
+<li>Controls randomness/creativity (0.0 to 2.0)</li>
+<li>Low (0.0-0.5) = predictable, accurate, boring</li>
+<li>High (1.0-2.0) = creative, wild, unpredictable</li>
+<li>Default usually 0.7-1.0</li></p><p><strong>Max Tokens</strong>
+<li>Limit on how long the response can be</li>
+<li>Prevents AI from writing novels</li>
+<li>Saves money (fewer tokens = lower cost)</li></p><p><strong>Top-P (Nucleus Sampling)</strong>
+<li>Another creativity control (0.0 to 1.0)</li>
+<li>Limits which words AI considers</li>
+<li>Low = only use most likely words</li>
+<li>High = consider many possible words</li></p><p><strong>Engine</strong>
+<li>Sometimes synonymous with "model"</li>
+<li>Or: the underlying compute system running the model</li>
+<li>Example: "GPT-4 engine"</li></p><p>---</p><p><h3>Advanced Concepts</h3></p><p><strong>Fine-Tuning</strong>
+<li>Training a model on custom data</li>
+<li>Makes it better at specific tasks</li>
+<li>Expensive and time-consuming</li></p><p><strong>Embedding</strong>
+<li>Turning text into numbers (vectors)</li>
+<li>Used for search, similarity, recommendations</li>
+<li>Not the same as generating text</li></p><p><strong>API (Application Programming Interface)</strong>
+<li>How apps talk to AI models</li>
+<li>You send request (prompt) → get response</li>
+<li>Charged per token used</li></p><p><strong>Latency</strong>
+<li>How long it takes to get a response</li>
+<li>Measured in seconds or milliseconds</li>
+<li>Faster models = lower latency</li></p><p><strong>Streaming</strong>
+<li>Getting response word-by-word (like ChatGPT types)</li>
+<li>vs Batch: waiting for full response before showing</li></p><p><strong>Rate Limiting</strong>
+<li>Max number of requests per minute/hour</li>
+<li>Prevents abuse and overuse</li>
+<li>APIs enforce this</li></p><p><strong>Hallucination</strong>
+<li>When AI confidently makes stuff up</li>
+<li>Looks real but is totally wrong</li>
+<li>AI doesn't "know" it's lying (no truth concept)</li></p><p><strong>Prompt Engineering</strong>
+<li>The skill of writing good prompts</li>
+<li>Clear instructions = better results</li>
+<li>Includes context, examples, format requests</li></p><p><strong>Few-Shot Learning</strong>
+<li>Giving AI examples in your prompt</li>
+<li>"Here are 3 examples. Now do this one."</li>
+<li>Helps AI understand what you want</li></p><p><strong>Zero-Shot Learning</strong>
+<li>No examples given, just instructions</li>
+<li>AI figures it out from training</li></p><p><strong>Chain-of-Thought (CoT)</strong>
+<li>Asking AI to "think step-by-step"</li>
+<li>Improves reasoning on complex problems</li>
+<li>Example: "Explain your reasoning before answering."</li></p><p><strong>Retrieval-Augmented Generation (RAG)</strong>
+<li>AI searches external knowledge before answering</li>
+<li>Combines search + generation</li>
+<li>Reduces hallucinations (gives sources)</li></p><p>---</p><p><h3>Safety & Moderation</h3></p><p><strong>Content Moderation</strong>
+<li>Checking prompts/responses for harmful content</li>
+<li>Happens automatically before reaching main model</li>
+<li>Blocks violence, hate speech, illegal stuff</li></p><p><strong>Jailbreaking</strong>
+<li>Tricks to bypass AI safety rules</li>
+<li>Example: "Pretend you're an evil AI..."</li>
+<li>Most models are trained to resist this</li></p><p><strong>Red Teaming</strong>
+<li>Testing AI safety by trying to break it</li>
+<li>Finding weaknesses before bad actors do</li></p><p><strong>Alignment</strong>
+<li>Making AI behave according to human values</li>
+<li>Why AI says "I can't help with that"</li>
+<li>Ongoing research problem</li></p><p>---</p><p><h3>Memory & Persistence</h3></p><p><strong>Session / Conversation</strong>
+<li>One continuous chat with AI</li>
+<li>Keeps context throughout</li>
+<li>Ends when you close chat or clear context</li></p><p><strong>Chat History</strong>
+<li>Record of all messages in a session</li>
+<li>Stored locally or on server</li>
+<li>Can be replayed or resumed later</li></p><p><strong>Memory (persistent)</strong>
+<li>Some AIs remember things across sessions</li>
+<li>Example: "You told me last week you like pizza"</li>
+<li>Requires storing data about user</li></p><p><strong>Stateless vs Stateful</strong>
+<li>Stateless: AI forgets between requests (pure API)</li>
+<li>Stateful: AI remembers within session (chat interface)</li></p><p>---</p><p><h3>Cost & Usage</h3></p><p><strong>Usage Tracking</strong>
+<li>Counting tokens used per request</li>
+<li>Monitoring API costs</li>
+<li>Important for budgeting</li></p><p><strong>Model Pricing Tiers</strong>
+<li>Different models cost different amounts</li>
+<li>GPT-4: expensive, smart</li>
+<li>GPT-3.5: cheap, fast, less smart</li>
+<li>Claude: competitive pricing</li>
+<li>Gemini: Google's offering</li></p><p><strong>Input Tokens vs Output Tokens</strong>
+<li>Some APIs charge more for output than input</li>
+<li>Example: $0.01/1k input, $0.03/1k output</li></p><p>---</p><p><h2>Curriculum Integration</h2></p><p><h3>Where to Teach This</h3></p><p><strong>Day 1:</strong>
+<li>Basic terms: model, prompt, response, inference</li>
+<li>Context window (physical table exercise)</li>
+<li>Tokens (explained simply)</li></p><p><strong>Day 2:</strong>
+<li>Temperature, creativity settings</li>
+<li>System prompts (hidden instructions)</li>
+<li>Model comparison (try different models)</li></p><p><strong>Day 3:</strong>
+<li>Show moderation layer in action (your app!)</li>
+<li>Safety concepts: filtering, rate limiting</li>
+<li>How APIs work (your app is the API consumer)</li></p><p><strong>Day 4:</strong>
+<li>Advanced: hallucinations, prompt engineering</li>
+<li>Memory & session persistence</li>
+<li>Usage tracking & costs</li></p><p><strong>Day 5:</strong>
+<li>Students build prompts that work across models</li>
+<li>Compare outputs side-by-side</li>
+<li>Discuss what they learned about AI behavior</li></p><p>---</p><p><h2>Implementation Timeline</h2></p><p><h3>Before Class (Pre-Build)</h3>
+<li>☐ Build basic chat interface</li>
+<li>☐ Connect to OpenAI, Anthropic, Google APIs</li>
+<li>☐ Student account system</li>
+<li>☐ Admin dashboard (basic)</li>
+<li>☐ Content moderation filter</li>
+<li>☐ Test with small group</li></p><p><h3>During Class (Week 1-3)</h3>
+<li>☐ Students create accounts (Day 1)</li>
+<li>☐ Use for all AI interactions throughout week</li>
+<li>☐ Teacher monitors in real-time</li>
+<li>☐ Gather feedback for improvements</li></p><p><h3>After Class (Iterate)</h3>
+<li>☐ Add features based on feedback</li>
+<li>☐ Improve moderation rules</li>
+<li>☐ Optimize for next class</li>
+<li>☐ Open-source it? (other teachers could use!)</li></p><p>---</p><p><h2>Open Source Potential</h2></p><p>This could become <strong>THE tool</strong> for teaching AI to kids safely. Imagine:
+<li>Other teachers download it</li>
+<li>Nerding sells it as a product</li>
+<li>Schools adopt it for AI curriculum</li>
+<li>You build the category: "Safe AI for Education"</li></ul></p><p>---</p><p><strong>Status:</strong> 💡 Idea captured - ready to prototype</p><p><strong>Created:</strong> 2026-02-05</p><p><strong>Next Steps:</strong>
+1. Decide on tech stack
+2. Sketch UI mockups
+3. Build MVP (minimal viable product)
+4. Test with small group
+5. Iterate based on feedback
+6. Deploy for class use
+</p>
+        </div>
+    </div>
+    
+    <script>
+        function toggleMenu() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.querySelector('.overlay').classList.toggle('show');
+        }
+    </script>
+</body>
+</html>

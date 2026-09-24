@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-Day Curriculum - AI Summer Class</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        /* Top-Right Hamburger Menu */
+        .hamburger-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .hamburger-button {
+            background: rgba(37, 99, 235, 0.9);
+            border: none;
+            border-radius: 12px;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .hamburger-button:hover {
+            background: rgba(37, 99, 235, 1);
+            transform: scale(1.05);
+        }
+        
+        .hamburger-button span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .hamburger-button.active span:nth-child(1) {
+            transform: rotate(45deg) translate(7px, 7px);
+        }
+        
+        .hamburger-button.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .hamburger-button.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+        
+        .menu-panel {
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 350px;
+            height: 100vh;
+            background: rgba(30, 58, 138, 0.98);
+            backdrop-filter: blur(20px);
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
+            transition: right 0.3s ease;
+            padding: 80px 30px 30px;
+            overflow-y: auto;
+            z-index: 999;
+        }
+        
+        .menu-panel.active {
+            right: 0;
+        }
+        
+        .menu-item {
+            margin-bottom: 15px;
+        }
+        
+        .menu-item a, .menu-item .menu-section-title {
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-size: 1.1em;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-item a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-5px);
+        }
+        
+        .menu-section-title {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+        
+        .menu-section-title:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .menu-section-title::after {
+            content: '▼';
+            font-size: 0.8em;
+            transition: transform 0.3s ease;
+        }
+        
+        .menu-section-title.active::after {
+            transform: rotate(180deg);
+        }
+        
+        .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding-left: 15px;
+        }
+        
+        .submenu.active {
+            max-height: 300px;
+            margin-top: 10px;
+        }
+        
+        .submenu a {
+            font-size: 1em;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .menu-panel {
+                width: 100%;
+                right: -100%;
+            }
+        }
+        
+        /* Left Sidebar Menu - Existing */
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: #2563eb;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            padding: 8px;
+        }
+        
+        .menu-btn span {
+            width: 24px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+        }
+        
+        .menu-btn:hover { background: #1d4ed8; }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: 0.3s;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 80px 20px 20px 20px;
+        }
+        
+        .sidebar.open { left: 0; }
+        
+        .sidebar h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 10px;
+            margin-top: 20px;
+        }
+        
+        .sidebar a {
+            display: block;
+            padding: 10px 15px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            transition: 0.2s;
+        }
+        
+        .sidebar a:hover {
+            background: #f0f0f0;
+            color: #2563eb;
+        }
+        
+        .sidebar a.active {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+        
+        .overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #2563eb;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .table-wrapper {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        table {
+            width: 100%;
+            min-width: 1200px;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 20px;
+            text-align: left;
+            border: 1px solid #e5e7eb;
+            vertical-align: top;
+        }
+        
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .time-col {
+            background: #fef3c7;
+            font-weight: 600;
+            width: 180px;
+            position: sticky;
+            left: 0;
+            z-index: 20;
+        }
+        
+        th.time-col {
+            background: #fbbf24;
+            z-index: 30;
+        }
+        
+        .day-header {
+            background: #2563eb;
+            color: white;
+            font-size: 1.1em;
+            text-align: center;
+        }
+        
+        .theme {
+            font-size: 0.9em;
+            font-weight: normal;
+            opacity: 0.9;
+            display: block;
+            margin-top: 5px;
+        }
+        
+        .activity {
+            margin-bottom: 15px;
+        }
+        
+        .activity-title {
+            font-weight: 600;
+            color: #111;
+            margin-bottom: 5px;
+        }
+        
+        .activity-desc {
+            font-size: 0.95em;
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        .duration {
+            font-size: 0.85em;
+            color: #888;
+            font-style: italic;
+        }
+        
+        .highlight {
+            background: #fef3c7;
+            border-left: 3px solid #f59e0b;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .star {
+            background: #dbeafe;
+            border-left: 3px solid #2563eb;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .break {
+            background: #f3f4f6;
+            text-align: center;
+            font-style: italic;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 2em; }
+            .container { padding: 20px 10px; }
+            th, td { padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top-Right Hamburger Menu (Main Site Navigation) -->
+    <div class="hamburger-menu">
+        <div class="hamburger-button" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+    
+    <div class="menu-panel" id="menuPanel">
+        <div class="menu-item">
+            <a href="/">🏠 Home</a>
+        </div>
+        <div class="menu-item">
+            <a href="/dashboard/">📊 Dashboard</a>
+        </div>
+        <div class="menu-item">
+            <a href="/youtube/">📺 YouTube Archive</a>
+        </div>
+        <div class="menu-item">
+            <div class="menu-section-title" onclick="toggleSubmenu(this)">
+                🎓 AI Class
+            </div>
+            <div class="submenu">
+                <a href="/ai-class/">Overview</a>
+                <a href="/ai-class/curriculum.html">Curriculum</a>
+            </div>
+        </div>
+        <div class="menu-item">
+            <a href="/spring-break/">🌴 Spring Break</a>
+        </div>
+    </div>
+    
+    <!-- Left Sidebar Menu (AI Class Documents) -->
+    <button class="menu-btn" onclick="toggleLeftMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <div class="overlay" onclick="toggleMenu()"></div>
+    
+    <nav class="sidebar">
+        <a href="index.html">🏠 Home</a>
+        <h3>Working Documents</h3>
+        <a href="overview.html">📋 Project Overview</a>
+        <a href="curriculum.html" class="active">📅 5-Day Curriculum</a>
+        <a href="innovation-history.html">🔄 Innovation &amp; Fear</a>
+        <a href="final-project.html">🎯 Final Project</a>
+        <a href="exercises.html">🏃 Physical Exercises</a>
+        <a href="chat-app.html">💬 Custom Chat App</a>
+        <a href="showcase.html">🎤 Parent Showcase</a>
+        <a href="forms.html">📝 Forms & Agreements</a>
+        <a href="topics.html">💡 Additional Topics</a>
+        <a href="platforms.html">💻 Chromebook Platforms</a>
+        <a href="ideas.html">🗂️ Ideas Backlog</a>
+    </nav>
+    
+    <div class="container">
+        <div class="header">
+            <h1>5-Day Curriculum Outline</h1>
+            <p class="subtitle">15 hours total • 3 hours/day • Grades 5-8</p>
+        </div>
+        
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="time-col">Time Block</th>
+                        <th class="day-header">Day 1<span class="theme">Foundations</span></th>
+                        <th class="day-header">Day 2<span class="theme">Capabilities</span></th>
+                        <th class="day-header">Day 3<span class="theme">Robotics & Future</span></th>
+                        <th class="day-header">Day 4<span class="theme">Society & Ethics</span></th>
+                        <th class="day-header">Day 5<span class="theme">Building & Showcase</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Welcome / Morning Start -->
+                    <tr>
+                        <td class="time-col">9:00-9:15<br><span class="duration">15 min</span></td>
+                        <td>
+                            <div class="activity">
+                                <div class="activity-title">Welcome & Intro</div>
+                                <div class="activity-desc">
+                                    • What is this class?<br>
+                                    • AI as a tool<br>
+                                    • Final projects overview<br>
+                                    • Sign agreements
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="activity">
+                                <div class="activity-title">Humans vs AI Intro</div>
+                                <div class="activity-desc">
+                                    • Speed comparison setup<br>
+                                    • Reading & writing tests
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="activity">
+                                <div class="activity-title">Robotics Overview</div>
+                                <div class="activity-desc">
+                                    • Humanoid robots intro<br>
+                                    • Video: Tesla Optimus<br>
+                                    • Video: Boston Dynamics
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="activity">
+                                <div class="activity-title">Job Impact Discussion</div>
+                                <div class="activity-desc">
+                                    • Current job changes<br>
+                                    • "20 → 1-2 with AI"<br>
+                                    • New careers created
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="activity">
+                                <div class="activity-title">Final Build Sprint</div>
+                                <div class="activity-desc">
+                                    • Finish web apps<br>
+                                    • Bug fixes & polish<br>
+                                    • Test all features
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Main Morning Block -->
+                    <tr>
+                        <td class="time-col">9:15-10:20<br><span class="duration">65 min</span></td>
+                        <td>
+                            <div class="activity">
+                                <div class="activity-title">What is AI? (30 min)</div>
+                                <div class="activity-desc">
+                                    • Video: AI basics<br>
+                                    • Companies & models<br>
+                                    • Capabilities overview
+                                </div>
+                            </div>
+                            <div class="activity">
+                                <div class="activity-title">Prompting 101 (30 min)</div>
+                                <div class="activity-desc">
+                                    • Good vs bad prompts<br>
+                                    • Try AI yourself<br>
+                                    • Context matters
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="activity highlight">
+                                <div class="activity-title">Humans vs AI Exercise (30 min)</div>
+                                <div class="activity-desc">
+                                    • Speed tests<br>
+                                    • Venn diagram<br>
+                                    • Superhumans<br>
+                                    • Neuralink discussion
+                                </div>
+                            </div>
+                            <div class="activity">
+                                <div class="activity-title">Multimodal: Images (30 min)</div>
+                                <div class="activity-desc">
+                                    • Image generation demo<br>
+                                    • Students create images<br>
+                                    • Ethics: art & copyright
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="activity">
+                                <div class="activity-title">Robotics Deep Dive (40 min)</div>
+                                <div class="activity-desc">
+                                    • Early struggles<br>
+                                    • Technical challenges<br>
+                                    • Current capabilities<br>
+                                    • Edge vs Cloud AI
+                                </div>
+                            </div>
+                            <div class="activity">
+                                <div class="activity-title">Tesla FSD Example (20 min)</div>
+                                <div class="activity-desc">
+                                    • Micah's real experience<br>
+                                    • How it works<br>
+                                    • What works / doesn't
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="activity">
+                                <div class="activity-title">Skills & Careers (20 min)</div>
+                                <div class="activity-desc">
+                                    • AI literacy importance<br>
+                                    • Future-proof skills<br>
+                                    • Career paths
+                                </div>
+                            </div>
+                            <div class="activity">
+                                <div class="activity-title">Ethics & Responsibility (40 min)</div>
+                                <div class="activity-desc">
+                                    • Bias in AI<br>
+                                    • Privacy concerns<br>
+                                    • Deepfakes<br>
+                                    • Misinformation<br>
+                                    • Environmental impact<br>
+                                    • AI for good
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="activity">
+                                <div class="activity-title">Deploy Apps (30 min)</div>
+                                <div class="activity-desc">
+                                    • Get live URLs<br>
+                                    • Final testing<br>
+                                    • Design polish
+                                </div>
+                            </div>
+                            <div class="activity">
+                                <div class="activity-title">Generate Presentations (30 min)</div>
+                                <div class="activity-desc">
+                                    • Compile all week's notes<br>
+                                    • Feed to AI<br>
+                                    • AI creates draft
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Learning Capture -->
+                    <tr>
+                        <td class="time-col">10:20-10:30<br><span class="duration">10 min</span></td>
+                        <td colspan="5" class="highlight" style="text-align: center;">
+                            <strong>📝 Learning Capture #1</strong> — Students dictate/write what they learned so far
+                        </td>
+                    </tr>
+                    
+                    <!-- Snack Break -->
+                    <tr>
+                        <td class="time-col">10:30-10:45<br><span class="duration">15 min</span></td>
+                        <td colspan="5" class="break">
+                            <strong>🍎 Snack Break</strong>
+                        </td>
+                    </tr>
+                    
+                    <!-- Afternoon Block -->
+                    <tr>
+                        <td class="time-col">10:45-11:50<br><span class="duration">65 min</span></td>
+                        <td>
+                            <div class="activity highlight">
+                                <div class="activity-title">Context Window Exercise (30 min)</div>
+                                <div class="activity-desc">
+                                    • Table demonstration<br>
+                                    • Papers fill up & fall off<br>
+                                    • Summarization demo
+                                </div>
+                            </div>
+                            <div class="activity">
+                                <div class="activity-title">Explore AI Tools (20 min)</div>
+                                <div class="activity-desc">
+                                    • Try different models<br>
+                                    • Compare outputs
+                                </div>
+                            </div>
+                            <div class="activity">
+                                <div class="activity-title">App Brainstorm (15 min)</div>
+                                <div class="activity-desc">
+                                    • Intro web app project<br>
+                                    • Start ideas list
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="activity">
+                                <div class="activity-title">Multimodal: Voice & Music (25 min)</div>
+                                <div class="activity-desc">
+                                    • ElevenLabs demo<br>
+                                    • Suno music generation<br>
+                                    • Create fun songs!
+                                </div>
+                            </div>
+                            <div class="activity">
+                                <div class="activity-title">Multimodal: Video (20 min)</div>
+                                <div class="activity-desc">
+                                    • Video generation tools<br>
+                                    • Deepfakes discussion
+                                </div>
+                            </div>
+                            <div class="activity">
+                                <div class="activity-title">App Planning (20 min)</div>
+                                <div class="activity-desc">
+                                    • Finalize app idea<br>
+                                    • Start planning doc<br>
+                                    • Sketch interface
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="activity">
+                                <div class="activity-title">Robot Economics (15 min)</div>
+                                <div class="activity-desc">
+                                    • When will families have robots?<br>
+                                    • Cost projections<br>
+                                    • Lease/buy options
+                                </div>
+                            </div>
+                            <div class="activity star">
+                                <div class="activity-title">🌟 LIVE AI FACILITATOR (45 min)</div>
+                                <div class="activity-desc">
+                                    <strong>THE HIGHLIGHT!</strong><br>
+                                    • AI leads activity via voice<br>
+                                    • Students respond verbally<br>
+                                    • AI sees via webcam<br>
+                                    • AI gives feedback<br>
+                                    • Glimpse into AI-led education
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="activity star">
+                                <div class="activity-title">🛠️ BUILD TIME (65 min)</div>
+                                <div class="activity-desc">
+                                    <strong>Heavy coding session!</strong><br>
+                                    • Work on web apps<br>
+                                    • AI-assisted coding<br>
+                                    • Debug & iterate<br>
+                                    • Teacher circulates<br>
+                                    • Get core features working
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="activity">
+                                <div class="activity-title">Add Visuals (15 min)</div>
+                                <div class="activity-desc">
+                                    • Generate images with AI<br>
+                                    • Add to presentations
+                                </div>
+                            </div>
+                            <div class="activity">
+                                <div class="activity-title">Build Slides (30 min)</div>
+                                <div class="activity-desc">
+                                    • Google Slides<br>
+                                    • Insert content & images<br>
+                                    • Customize design
+                                </div>
+                            </div>
+                            <div class="activity">
+                                <div class="activity-title">Rehearse (20 min)</div>
+                                <div class="activity-desc">
+                                    • Practice presentations<br>
+                                    • Test web app demos<br>
+                                    • Peer feedback
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Final Learning Capture / Showcase -->
+                    <tr>
+                        <td class="time-col">11:50-12:00<br><span class="duration">10 min</span></td>
+                        <td colspan="4" class="highlight" style="text-align: center;">
+                            <strong>📝 Learning Capture #2</strong> — End of day reflection & notes
+                        </td>
+                        <td class="star">
+                            <div class="activity-title">🎤 PARENT SHOWCASE (starts 11:15)</div>
+                            <div class="activity-desc">
+                                <strong>Last 45 minutes!</strong><br>
+                                • Parents arrive<br>
+                                • Quick AI experience<br>
+                                • Student presentations<br>
+                                • Gallery walk<br>
+                                • Take-home packets
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div style="background: white; padding: 30px; border-radius: 12px; margin-top: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+            <h2 style="color: #2563eb; margin-bottom: 15px;">Daily Pattern</h2>
+            <ul style="line-height: 2;">
+                <li><strong>Morning (9:00-10:30):</strong> Teaching, demonstrations, physical exercises</li>
+                <li><strong>Learning Capture #1:</strong> Quick notes on what was learned</li>
+                <li><strong>Snack Break:</strong> 15 minutes to recharge</li>
+                <li><strong>Afternoon (10:45-11:50):</strong> Hands-on activities, building time</li>
+                <li><strong>Learning Capture #2:</strong> End-of-day reflection</li>
+            </ul>
+            
+            <h2 style="color: #2563eb; margin-top: 30px; margin-bottom: 15px;">Key Features</h2>
+            <ul style="line-height: 2;">
+                <li>✅ <strong>Progressive complexity</strong> — Concepts → Applications → Creation</li>
+                <li>✅ <strong>Mix of formats</strong> — Videos, exercises, discussions, building</li>
+                <li>✅ <strong>Daily captures</strong> — Feed final AI-generated presentation</li>
+                <li>✅ <strong>Two projects</strong> — Presentation + Web App</li>
+                <li>✅ <strong>Signature moments</strong> — Context table, Live AI, Showcase</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // Top-right menu (main site navigation) - NEW
+        function toggleMenu() {
+            const button = document.querySelector('.hamburger-button');
+            const panel = document.getElementById('menuPanel');
+            button.classList.toggle('active');
+            panel.classList.toggle('active');
+        }
+        
+        function toggleSubmenu(element) {
+            const submenu = element.nextElementSibling;
+            element.classList.toggle('active');
+            submenu.classList.toggle('active');
+        }
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.querySelector('.hamburger-menu');
+            const panel = document.getElementById('menuPanel');
+            const button = document.querySelector('.hamburger-button');
+            const sidebar = document.querySelector('.sidebar');
+            const menuBtn = document.querySelector('.menu-btn');
+            const overlay = document.querySelector('.overlay');
+            
+            // Close right menu if clicking outside of it
+            if (menu && panel && button && !menu.contains(event.target) && !panel.contains(event.target)) {
+                button.classList.remove('active');
+                panel.classList.remove('active');
+            }
+            
+            // Keep left sidebar functionality
+            if (sidebar && menuBtn && overlay && !sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('show');
+            }
+        });
+        
+        // Left sidebar menu (AI Class documents) - EXISTING
+        function toggleLeftMenu() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.querySelector('.overlay').classList.toggle('show');
+        }
+    </script>
+</body>
+</html>

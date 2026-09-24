@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring Break STEM Camp Survey | Nerding</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+        }
+        
+        /* Hamburger Menu Navigation */
+        .hamburger {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1000;
+            background: #F69658;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: background 0.3s;
+        }
+        
+        .hamburger:hover {
+            background: #e67e40;
+        }
+        
+        .nav-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+            z-index: 999;
+            padding: 5rem 0 2rem 0;
+        }
+        
+        .nav-menu.open {
+            left: 0;
+        }
+        
+        .nav-menu a {
+            display: block;
+            padding: 1rem 2rem;
+            color: #2c3e50;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: background 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .nav-menu a:hover {
+            background: #f8f9fa;
+            border-left-color: #F69658;
+        }
+        
+        .nav-menu a.active {
+            background: linear-gradient(90deg, rgba(246,150,88,0.1) 0%, transparent 100%);
+            border-left-color: #F69658;
+            font-weight: 600;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: 998;
+        }
+        
+        .overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Hero/Header */
+        .form-header {
+            background: linear-gradient(135deg, #F69658 0%, #7bdcb5 100%);
+            color: white;
+            padding: 3rem 1rem 2rem;
+            text-align: center;
+        }
+        
+        .form-header .logo {
+            width: 100px;
+            height: auto;
+            margin: 0 auto 1rem;
+            display: block;
+        }
+        
+        .form-header h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .form-header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 800px;
+            margin: -1rem auto 2rem;
+            padding: 0 1rem;
+        }
+        
+        /* Form Card */
+        .form-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 2rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #2c3e50;
+            font-size: 1rem;
+        }
+        
+        .required {
+            color: #e74c3c;
+            margin-left: 0.2rem;
+        }
+        
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="tel"],
+        .form-group textarea {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #F69658;
+            box-shadow: 0 0 0 3px rgba(246, 150, 88, 0.1);
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .helper-text {
+            font-size: 0.875rem;
+            color: #666;
+            margin-top: 0.4rem;
+            font-style: italic;
+        }
+        
+        /* Checkbox & Radio Groups */
+        .checkbox-group,
+        .radio-group {
+            margin-top: 0.75rem;
+        }
+        
+        .checkbox-item,
+        .radio-item {
+            margin-bottom: 0.875rem;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .checkbox-item input[type="checkbox"],
+        .radio-item input[type="radio"] {
+            margin-right: 0.75rem;
+            margin-top: 0.2rem;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #F69658;
+        }
+        
+        .checkbox-item label,
+        .radio-item label {
+            margin-bottom: 0;
+            font-weight: 400;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .option-description {
+            font-size: 0.875rem;
+            color: #666;
+            margin-top: 0.2rem;
+        }
+        
+        /* Submit Button */
+        .submit-button {
+            background: linear-gradient(135deg, #F69658 0%, #7bdcb5 100%);
+            color: white;
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+            margin-top: 1rem;
+        }
+        
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(246, 150, 88, 0.4);
+        }
+        
+        .submit-button:active {
+            transform: translateY(0);
+        }
+        
+        /* Privacy Note */
+        .privacy-note {
+            background: #f8f9fa;
+            border-left: 4px solid #F69658;
+            padding: 1.25rem;
+            margin-top: 2rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.6;
+        }
+        
+        .privacy-note strong {
+            color: #2c3e50;
+        }
+        
+        /* Section Divider */
+        .section-divider {
+            border: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #e0e0e0, transparent);
+            margin: 2.5rem 0;
+        }
+        
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .form-header h1 {
+                font-size: 1.6rem;
+            }
+            
+            .form-header p {
+                font-size: 1rem;
+            }
+            
+            .form-header .logo {
+                width: 80px;
+            }
+            
+            .form-card {
+                padding: 1.5rem;
+            }
+            
+            .submit-button {
+                padding: 0.875rem 2rem;
+                font-size: 1rem;
+            }
+        }
+        
+        /* iPhone 15 Pro Max specific (430px) */
+        @media (max-width: 430px) {
+            .form-header {
+                padding: 2rem 1rem 1.5rem;
+            }
+            
+            .form-header .logo {
+                width: 70px;
+            }
+            
+            .form-card {
+                padding: 1.25rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hamburger Menu Button -->
+    <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">☰</button>
+    
+    <!-- Navigation Menu -->
+    <nav class="nav-menu" id="navMenu">
+        <a href="index.html">Spring Break Home</a>
+        <a href="path-email.html">Path Email</a>
+        <a href="general-email.html">General Email</a>
+        <a href="survey.html" class="active">Survey Form</a>
+    </nav>
+    
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <div class="form-header">
+        <img src="nerding-bulb-logo.svg" alt="Nerding Logo" class="logo">
+        <h1>📝 Spring Break STEM Camp 2026 - Interest Survey</h1>
+        <p>Help us plan the perfect camp! This quick survey lets us know what classes to offer and how many spots we need. Your input makes a difference!</p>
+    </div>
+
+    <div class="container">
+        <div class="form-card">
+            <form id="surveyForm">
+                <!-- Parent First Name -->
+                <div class="form-group">
+                    <label for="parentFirstName">
+                        Parent First Name<span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="parentFirstName" 
+                        name="parentFirstName" 
+                        required
+                        placeholder="First name"
+                    >
+                </div>
+
+                <!-- Parent Last Name -->
+                <div class="form-group">
+                    <label for="parentLastName">
+                        Parent Last Name<span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="parentLastName" 
+                        name="parentLastName" 
+                        required
+                        placeholder="Last name"
+                    >
+                </div>
+
+                <!-- Email Address -->
+                <div class="form-group">
+                    <label for="email">
+                        Email Address<span class="required">*</span>
+                    </label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        required
+                        placeholder="your.email@example.com"
+                    >
+                </div>
+
+                <!-- Phone Number -->
+                <div class="form-group">
+                    <label for="phone">
+                        Phone Number
+                    </label>
+                    <input 
+                        type="tel" 
+                        id="phone" 
+                        name="phone"
+                        placeholder="(555) 123-4567"
+                    >
+                    <div class="helper-text">Want a text alert when registration opens?</div>
+                </div>
+
+                <hr class="section-divider">
+
+                <!-- Student Grade Levels -->
+                <div class="form-group">
+                    <label for="gradeLevels">
+                        Student Grade Levels<span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="gradeLevels" 
+                        name="gradeLevels" 
+                        required
+                        placeholder="e.g., 3rd grade, 5th grade"
+                    >
+                    <div class="helper-text">List all your kids' grade levels (for Spring 2026)</div>
+                </div>
+
+                <!-- Class Interest -->
+                <div class="form-group">
+                    <label>
+                        Which classes are you interested in?<span class="required">*</span>
+                    </label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input 
+                                type="checkbox" 
+                                id="class3dPrinting" 
+                                name="classInterest" 
+                                value="3D Printing (Grades 3-7)"
+                            >
+                            <label for="class3dPrinting">
+                                3D Printing
+                                <div class="option-description">Grades 3-7 • Design and print 3D creations</div>
+                            </label>
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input 
+                                type="checkbox" 
+                                id="classEscape" 
+                                name="classInterest" 
+                                value="Escape Lost Cities (Grades 3-7)"
+                            >
+                            <label for="classEscape">
+                                Escape Lost Cities
+                                <div class="option-description">Grades 3-7 • Solve puzzles and crack codes</div>
+                            </label>
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input 
+                                type="checkbox" 
+                                id="classSpace" 
+                                name="classInterest" 
+                                value="Space Explorers (Grades 1-2)"
+                            >
+                            <label for="classSpace">
+                                Space Explorers
+                                <div class="option-description">Grades 1-2 • Solar system exploration & hands-on fun</div>
+                            </label>
+                        </div>
+
+                        <div class="checkbox-item">
+                            <input 
+                                type="checkbox" 
+                                id="classBoth" 
+                                name="classInterest" 
+                                value="Both 3D & Escape (all-day)"
+                            >
+                            <label for="classBoth">
+                                Both 3D & Escape (all-day option)
+                                <div class="option-description">Morning + Afternoon • Drop-off 9:00 AM, pick-up 4:00 PM</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Availability -->
+                <div class="form-group">
+                    <label>
+                        What time works best for your family?<span class="required">*</span>
+                    </label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input 
+                                type="radio" 
+                                id="timeMorning" 
+                                name="availability" 
+                                value="Morning only (9-12)"
+                                required
+                            >
+                            <label for="timeMorning">
+                                🌅 Morning only (9:00 AM - 12:00 PM)
+                            </label>
+                        </div>
+
+                        <div class="radio-item">
+                            <input 
+                                type="radio" 
+                                id="timeAfternoon" 
+                                name="availability" 
+                                value="Afternoon only (1-4)"
+                            >
+                            <label for="timeAfternoon">
+                                🌆 Afternoon only (1:00 PM - 4:00 PM)
+                            </label>
+                        </div>
+
+                        <div class="radio-item">
+                            <input 
+                                type="radio" 
+                                id="timeAllDay" 
+                                name="availability" 
+                                value="All day (9:00-4:00)"
+                            >
+                            <label for="timeAllDay">
+                                All day (Drop-off 9:00 AM, Pick-up 4:00 PM)
+                            </label>
+                        </div>
+
+                        <div class="radio-item">
+                            <input 
+                                type="radio" 
+                                id="timeNoPreference" 
+                                name="availability" 
+                                value="No preference"
+                            >
+                            <label for="timeNoPreference">
+                                🤷 No preference / Flexible
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
+                <!-- Comments/Questions -->
+                <div class="form-group">
+                    <label for="comments">
+                        Questions or Comments
+                    </label>
+                    <textarea 
+                        id="comments" 
+                        name="comments"
+                        placeholder="Anything else you'd like us to know? Questions about pricing, schedule, or curriculum? Let us know!"
+                    ></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-button">
+                    🚀 Submit Survey
+                </button>
+
+                <!-- Privacy Note -->
+                <div class="privacy-note">
+                    🔒 <strong>Privacy Promise:</strong> All responses go directly to Niecy. Not shared with anyone. Humans only, no AI.
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer style="background: #2c3e50; color: white; padding: 2rem 1rem; text-align: center; margin-top: 2rem;">
+        <p><strong>NERDING</strong></p>
+        <p>Science • Technology • Engineering • Making</p>
+        <p style="margin-top: 0.5rem; opacity: 0.8;">STEM classes for curious, creative, and inventive nerds</p>
+        <p style="margin-top: 1rem;"><a href="https://nerding.org" style="color: #F69658; text-decoration: none;">nerding.org</a></p>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('navMenu');
+            const overlay = document.getElementById('overlay');
+            menu.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
+
+        document.getElementById('surveyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Check if at least one class is selected
+            const classCheckboxes = document.querySelectorAll('input[name="classInterest"]:checked');
+            if (classCheckboxes.length === 0) {
+                alert('Please select at least one class you\'re interested in!');
+                return;
+            }
+            
+            // Show thank you message (this is a mockup)
+            alert('Thank you! (This is a preview)\n\nYour survey response has been recorded. We\'ll email you when registration opens in about a week!');
+            
+            // Optional: Reset form after submission
+            // this.reset();
+        });
+    </script>
+</body>
+</html>

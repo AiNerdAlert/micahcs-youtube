@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>forms - AI Summer Class</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: #2563eb;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            padding: 8px;
+        }
+        
+        .menu-btn span {
+            width: 24px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+        }
+        
+        .menu-btn:hover { background: #1d4ed8; }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: 0.3s;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 80px 20px 20px 20px;
+        }
+        
+        .sidebar.open { left: 0; }
+        
+        .sidebar h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 10px;
+            margin-top: 20px;
+        }
+        
+        .sidebar a {
+            display: block;
+            padding: 10px 15px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            transition: 0.2s;
+        }
+        
+        .sidebar a:hover {
+            background: #f0f0f0;
+            color: #2563eb;
+        }
+        
+        .sidebar a.active {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+        
+        .overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .content {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        h1 {
+            color: #2563eb;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        h2 {
+            color: #333;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #555;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+        
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 20px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        
+        hr {
+            border: none;
+            border-top: 2px solid #e5e7eb;
+            margin: 40px 0;
+        }
+        
+        strong {
+            color: #111;
+            font-weight: 600;
+        }
+        
+        a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .content { padding: 20px; }
+            h1 { font-size: 2em; }
+            h2 { font-size: 1.5em; }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-btn" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <div class="overlay" onclick="toggleMenu()"></div>
+    
+    <nav class="sidebar">
+        <a href="index.html">🏠 Home</a>
+        <h3>Working Documents</h3>
+        <a href="overview.html" class="">📋 Project Overview</a>
+        <a href="curriculum.html" class="">📅 5-Day Curriculum</a>
+        <a href="innovation-history.html">🔄 Innovation &amp; Fear</a>
+        <a href="final-project.html" class="">🎯 Final Project</a>
+        <a href="exercises.html" class="">🏃 Physical Exercises</a>
+        <a href="chat-app.html" class="">💬 Custom Chat App</a>
+        <a href="showcase.html" class="">🎤 Parent Showcase</a>
+        <a href="forms.html" class="active">📝 Forms & Agreements</a>
+        <a href="topics.html" class="">💡 Additional Topics</a>
+        <a href="platforms.html" class="">💻 Chromebook Platforms</a>
+        <a href="ideas.html" class="">🗂️ Ideas Backlog</a>
+    </nav>
+    
+    <div class="container">
+        <div class="content">
+            <p><h1>Forms & Agreements Needed</h1></p><p><strong>Purpose:</strong> Ensure students use AI responsibly, set parent expectations, gather pre-class info</p><p>---</p><p><h2>📋 Required Forms</h2></p><p><h3>1. Student Responsible Use Agreement</h3>
+<strong>When:</strong> During registration (parents sign) and first day of class (students sign)
+<strong>Purpose:</strong> Commitment to use AI tools appropriately</p><p><h3>2. Pre-Class Student Questionnaire</h3>
+<strong>When:</strong> During registration or sent before first day
+<strong>Purpose:</strong> Understand student's existing AI knowledge and excitement level</p><p><h3>3. Parent Information & Consent</h3>
+<strong>When:</strong> During registration
+<strong>Purpose:</strong> Educate parents, get consent, set expectations</p><p><h3>4. Post-Class Feedback Survey</h3>
+<strong>When:</strong> After showcase on Friday
+<strong>Purpose:</strong> Gather feedback for future iterations</p><p>---</p><p><h2>📜 Form 1: Student Responsible Use Agreement</h2></p><p><h3>Purpose</h3>
+<ul><li>Students promise to use AI tools appropriately</li>
+<li>Sets clear boundaries</li>
+<li>Protects Nerding from liability</li>
+<li>Educates about AI capabilities and risks</li></p><p><h3>Tone</h3>
+<li><strong>NOT scary</strong> - Don't make parents panic</li>
+<li><strong>Educational</strong> - Help them understand why this matters</li>
+<li><strong>Positive</strong> - Frame as empowering responsible use</li>
+<li><strong>Age-appropriate</strong> - Kids can understand it</li></p><p><h3>Draft Content</h3></p><p>---</p><p><strong>AI Summer Class - Responsible Use Agreement</strong></p><p><strong>Student Name:</strong> ____________________  
+<strong>Parent/Guardian Name:</strong> ____________________  
+<strong>Date:</strong> ____________________</p><p><strong>What You'll Learn:</strong>
+In this class, you'll learn to use powerful AI tools including:
+<li>AI chatbots (like ChatGPT, Claude, Gemini)</li>
+<li>Image generation tools</li>
+<li>Voice and video creation tools</li>
+<li>Code assistants and more</li></p><p><strong>These tools are AWESOME... and powerful.</strong></p><p>Like any powerful tool, AI should be used responsibly. Just like you wouldn't use a hammer to break windows, you should use AI to create, learn, and help — not to harm or deceive.</p><p><strong>I promise to:</strong></p><p>✅ Keep all my AI projects <strong>school-appropriate</strong>  
+   - No inappropriate, violent, or mean content
+   - No trying to trick or fool people with AI</p><p>✅ Be <strong>honest</strong> about what AI created  
+   - I'll tell people when something was made by AI
+   - I won't pretend AI work is 100% my own work
+   - I won't use AI to cheat on schoolwork</p><p>✅ Be <strong>kind and respectful</strong>  
+   - I won't use AI to bully, harass, or hurt anyone
+   - I won't create deepfakes or fake content about real people
+   - I'll respect others' privacy and creative work</p><p>✅ Think <strong>critically</strong>  
+   - I'll remember that AI can make mistakes
+   - I'll fact-check important information
+   - I'll use my own judgment, not just trust AI blindly</p><p>✅ Use AI as a <strong>tool, not a replacement</strong> for learning  
+   - AI helps me create and learn faster
+   - But I still need to understand what I'm doing
+   - AI assists me; I'm still in control</p><p><strong>During class AND after class, I'll use AI tools responsibly.</strong></p><p>---</p><p><strong>Student Signature:</strong> ____________________  
+<strong>Parent/Guardian Signature:</strong> ____________________  
+<strong>Date:</strong> ____________________</p><p>---</p><p><h3>Parent Section (on same form or separate page)</h3></p><p><strong>Dear Parents/Guardians,</strong></p><p>Your child will be learning to use cutting-edge AI tools in this class. These are the same tools professionals use for work, creativity, and productivity. Our goal is to teach <strong>responsible AI literacy</strong> — empowering your child to use these tools safely and effectively.</p><p><strong>Why this agreement matters:</strong>
+AI tools are powerful and accessible. Your child may already be using them (or will soon). This class teaches them HOW to use AI responsibly, think critically about AI output, and understand AI's capabilities and limitations.</p><p><strong>We will NOT:</strong>
+<li>Expose students to inappropriate content</li>
+<li>Allow unsupervised AI use</li>
+<li>Encourage cheating or deception</li>
+<li>Create deepfakes of real people</li></p><p><strong>We WILL:</strong>
+<li>Teach prompt engineering and critical thinking</li>
+<li>Discuss ethics, bias, and misinformation</li>
+<li>Create school-appropriate projects</li>
+<li>Emphasize AI as a tool to assist learning, not replace it</li></p><p>By signing, you acknowledge your child will use AI tools during class and agree to discuss responsible AI use at home.</p><p><strong>Questions?</strong> Contact us at [email/phone]</p><p>---</p><p>---</p><p><h2>📝 Form 2: Pre-Class Student Questionnaire</h2></p><p><h3>Purpose</h3>
+<li>Gauge existing AI knowledge</li>
+<li>Identify students who've used AI before</li>
+<li>Measure excitement and expectations</li>
+<li>Tailor class to student levels</li></p><p><h3>Questions</h3></p><p><strong>AI Summer Class - Student Pre-Class Survey</strong></p><p><strong>Name:</strong> ____________________  
+<strong>Age/Grade:</strong> ____________________</p><p><strong>1. Have you used AI before? (Check all that apply)</strong>
+<li>☐ ChatGPT or similar chatbots</li>
+<li>☐ AI image generators (DALL-E, Midjourney, etc.)</li>
+<li>☐ AI for homework help</li>
+<li>☐ AI in games or apps</li>
+<li>☐ Voice assistants (Siri, Alexa, Google Assistant)</li>
+<li>☐ I've never used AI</li>
+<li>☐ I'm not sure if I've used AI</li></p><p><strong>2. What do you MOST want to learn about AI?</strong> (Pick top 3)
+<li>☐ How to give AI better instructions (prompting)</li>
+<li>☐ How AI works "under the hood"</li>
+<li>☐ Building something with AI</li>
+<li>☐ Robotics and physical AI</li>
+<li>☐ How AI will change jobs/careers</li>
+<li>☐ AI art and creativity</li>
+<li>☐ Self-driving cars and future tech</li>
+<li>☐ Ethical issues with AI</li>
+<li>☐ Other: ___________________</li></p><p><strong>3. On a scale of 1-10, how excited are you for this class?</strong>
+<li>1 (Not excited) ... 5 (Somewhat excited) ... 10 (SUPER EXCITED!)</li></p><p><strong>4. What's one thing you want to BUILD with AI this week?</strong>
+<li>(Open response - let them dream!)</li></p><p><strong>5. Have you ever created something using AI? If yes, what?</strong>
+<li>(Open response)</li></p><p><strong>6. What's one question you have about AI?</strong>
+<li>(Open response)</li></p><p><strong>7. What do you think AI is GOOD at?</strong>
+<li>(Open response - see what they already know)</li></p><p><strong>8. What do you think AI is NOT good at?</strong>
+<li>(Open response)</li></p><p><strong>9. Do you have any worries or concerns about AI?</strong>
+<li>(Open response - surface fears to address)</li></p><p><strong>10. How do you learn best?</strong> (Check all that apply)
+<li>☐ Watching videos</li>
+<li>☐ Hands-on activities</li>
+<li>☐ Reading/instructions</li>
+<li>☐ Working with others</li>
+<li>☐ Trial and error</li></p><p>---</p><p><strong>Optional for Nerding:</strong>
+<li>Dietary restrictions (for snacks):</li>
+<li>Any accommodations we should know about:</li></p><p>---</p><p>---</p><p><h2>📄 Form 3: Parent Information & Consent</h2></p><p><h3>Purpose</h3>
+<li>Educate parents about class content</li>
+<li>Set expectations</li>
+<li>Get consent for AI tool use</li>
+<li>Address common concerns preemptively</li></p><p><h3>Draft Content</h3></p><p><strong>AI Summer Class - Parent Information & Consent</strong></p><p><strong>Student Name:</strong> ____________________  
+<strong>Parent/Guardian Name:</strong> ____________________  
+<strong>Email:</strong> ____________________  <strong>Phone:</strong> ____________________</p><p>---</p><p><strong>What This Class Covers:</strong></p><p>Your child will learn practical AI literacy — how to USE AI as a tool for learning, creativity, and problem-solving. This is not just theory; they'll interact with real AI systems and build working projects.</p><p><strong>Topics include:</strong>
+<li>✅ How to prompt AI effectively (give clear instructions)</li>
+<li>✅ Understanding AI capabilities and limitations</li>
+<li>✅ Different AI models and companies (OpenAI, Google, Anthropic, etc.)</li>
+<li>✅ Multimodal AI: images, voice, video, music generation</li>
+<li>✅ Robotics and the future of AI (Tesla Optimus, Boston Dynamics, etc.)</li>
+<li>✅ AI's impact on jobs and society</li>
+<li>✅ Ethics: bias, deepfakes, misinformation, responsible use</li>
+<li>✅ Hands-on building: website or web app powered by AI</li>
+<li>✅ Friday showcase where students present their projects</li></p><p><strong>AI Tools Students Will Use:</strong>
+<li>AI chatbots (ChatGPT, Claude, Gemini, or similar)</li>
+<li>Image generation tools</li>
+<li>Voice/music generation tools</li>
+<li>Code assistants (GitHub Copilot, Replit AI, etc.)</li>
+<li>Browser-based development platforms (Replit, Glitch, etc.)</li></p><p><strong>Safety Measures:</strong>
+<li>✅ Teacher-supervised AI use at all times</li>
+<li>✅ Content filters and safety settings enabled</li>
+<li>✅ No personal information shared with AI systems</li>
+<li>✅ Responsible Use Agreement signed by students</li>
+<li>✅ Age-appropriate discussions of ethics and risks</li></p><p><strong>Your Role:</strong>
+<li>Discuss AI use with your child at home</li>
+<li>Review the take-home packet we provide</li>
+<li>Support continued learning after class ends</li>
+<li>Monitor AI use outside of class</li></p><p><strong>Consent:</strong></p><p>I have read and understand the class content and AI tools that will be used.</p><p>I give permission for my child to:
+<li>☐ Use AI chatbots and generative tools during class</li>
+<li>☐ Create and deploy a web-based project</li>
+<li>☐ Have their project showcased to parents on Friday</li>
+<li>☐ Receive take-home materials about AI</li></p><p>I understand that:
+<li>☐ AI tools have limitations and can make mistakes</li>
+<li>☐ Students will be taught to fact-check and think critically</li>
+<li>☐ Responsible use of AI will be emphasized throughout</li>
+<li>☐ This class aims to prepare students for an AI-integrated future</li></p><p>---</p><p><strong>Parent Signature:</strong> ____________________  
+<strong>Date:</strong> ____________________</p><p>---</p><p><strong>Questions or Concerns?</strong>  
+Contact: [Nerding contact info]</p><p>---</p><p>---</p><p><h2>📊 Form 4: Post-Class Feedback Survey</h2></p><p><h3>For Parents (after showcase)</h3></p><p><strong>AI Summer Class - Parent Feedback</strong></p><p><strong>Thank you for attending today's showcase!</strong></p><p>Please help us improve by answering a few quick questions:</p><p><strong>1. Before this class, how familiar were YOU with AI?</strong>
+<li>☐ Very familiar</li>
+<li>☐ Somewhat familiar</li>
+<li>☐ Not very familiar</li>
+<li>☐ Not at all familiar</li></p><p><strong>2. After today's showcase, do you better understand what AI is and how it works?</strong>
+<li>☐ Yes, much better</li>
+<li>☐ Somewhat better</li>
+<li>☐ About the same</li>
+<li>☐ No</li></p><p><strong>3. What surprised you most about what your child learned?</strong>
+<li>(Open response)</li></p><p><strong>4. Do you feel this class was valuable for your child?</strong>
+<li>☐ Very valuable</li>
+<li>☐ Somewhat valuable</li>
+<li>☐ Not sure</li>
+<li>☐ Not valuable</li></p><p><strong>5. Would you enroll your child in another AI class?</strong>
+<li>☐ Definitely</li>
+<li>☐ Probably</li>
+<li>☐ Maybe</li>
+<li>☐ No</li></p><p><strong>6. What AI topics would you like covered in a future class?</strong>
+<li>(Open response)</li></p><p><strong>7. Any other feedback or suggestions?</strong>
+<li>(Open response)</li></p><p>---</p><p><h3>For Students (verbal or written Friday)</h3></p><p><strong>Quick Check-In:</strong></p><p><strong>1. What was your FAVORITE part of this week?</strong></p><p><strong>2. What was the HARDEST part?</strong></p><p><strong>3. On a scale of 1-10, how much did you learn?</strong></p><p><strong>4. Would you recommend this class to a friend? Why or why not?</strong></p><p><strong>5. What's ONE thing you want to build with AI now that class is over?</strong></p><p>---</p><p>---</p><p><h2>📝 Form Distribution Plan</h2></p><p>| Form | When | How |
+|------|------|-----|
+| Responsible Use Agreement | Registration | Online form or PDF |
+| Pre-Class Questionnaire | 1 week before class starts | Email link to Google Form |
+| Parent Info & Consent | Registration | Part of signup process |
+| Post-Class Feedback (Parents) | Friday after showcase | QR code or email link |
+| Post-Class Feedback (Students) | Friday last 5 min of class | Verbal or quick paper form |</p><p>---</p><p><h2>⚖️ Legal/Liability Notes</h2></p><p><strong>Consult with Nerding's insurance/legal:</strong>
+<li>Is the Responsible Use Agreement sufficient?</li>
+<li>Do we need additional liability waivers?</li>
+<li>Any specific language required for working with minors & AI?</li>
+<li>Data privacy concerns (are student inputs stored by AI companies)?</li></ul></p><p><strong>Recommendation:</strong> Keep language positive and educational, not legalistic and scary. Frame as empowerment, not restriction.</p><p>---</p><p><strong>Next Steps:</strong>
+1. Draft actual forms using templates above
+2. Get legal review if needed
+3. Design forms to match Nerding branding
+4. Decide on digital vs print distribution
+5. Test with a few parents before launch (feedback on clarity/tone)
+</p>
+        </div>
+    </div>
+    
+    <script>
+        function toggleMenu() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.querySelector('.overlay').classList.toggle('show');
+        }
+    </script>
+</body>
+</html>

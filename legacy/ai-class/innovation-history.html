@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Innovation & Fear Research - AI Summer Class</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        /* Top-Right Hamburger Menu */
+        .hamburger-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .hamburger-button {
+            background: rgba(37, 99, 235, 0.9);
+            border: none;
+            border-radius: 12px;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .hamburger-button:hover {
+            background: rgba(37, 99, 235, 1);
+            transform: scale(1.05);
+        }
+
+        .hamburger-button span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-button.active span:nth-child(1) {
+            transform: rotate(45deg) translate(7px, 7px);
+        }
+
+        .hamburger-button.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-button.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        .menu-panel {
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 350px;
+            height: 100vh;
+            background: rgba(30, 58, 138, 0.98);
+            backdrop-filter: blur(20px);
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
+            transition: right 0.3s ease;
+            padding: 80px 30px 30px;
+            overflow-y: auto;
+            z-index: 999;
+        }
+
+        .menu-panel.active {
+            right: 0;
+        }
+
+        .menu-item {
+            margin-bottom: 15px;
+        }
+
+        .menu-item a, .menu-item .menu-section-title {
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-size: 1.1em;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-item a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-5px);
+        }
+
+        .menu-section-title {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .menu-section-title:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .menu-section-title::after {
+            content: '▼';
+            font-size: 0.8em;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-section-title.active::after {
+            transform: rotate(180deg);
+        }
+
+        .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding-left: 15px;
+        }
+
+        .submenu.active {
+            max-height: 300px;
+            margin-top: 10px;
+        }
+
+        .submenu a {
+            font-size: 1em;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .menu-panel {
+                width: 100%;
+                right: -100%;
+            }
+        }
+
+        /* Left Sidebar */
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: #2563eb;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            padding: 8px;
+        }
+
+        .menu-btn span {
+            width: 24px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+        }
+
+        .menu-btn:hover { background: #1d4ed8; }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: 0.3s;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 80px 20px 20px 20px;
+        }
+
+        .sidebar.open { left: 0; }
+
+        .sidebar h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 10px;
+            margin-top: 20px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 10px 15px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            transition: 0.2s;
+        }
+
+        .sidebar a:hover {
+            background: #f0f0f0;
+            color: #2563eb;
+        }
+
+        .sidebar a.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+
+        .overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            color: #2563eb;
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .thesis-box {
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .thesis-box h2 {
+            font-size: 1.4em;
+            margin-bottom: 15px;
+        }
+
+        .thesis-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .thesis-box li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            font-size: 1.05em;
+        }
+
+        .thesis-box li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #fbbf24;
+            font-weight: bold;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .section h2 {
+            color: #2563eb;
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .research-item {
+            border-left: 3px solid #e5e7eb;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .research-item:hover {
+            border-left-color: #2563eb;
+            background: #f8fafc;
+        }
+
+        .research-item.researched {
+            border-left-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .item-number {
+            display: inline-block;
+            background: #e5e7eb;
+            color: #666;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        .researched .item-number {
+            background: #10b981;
+            color: white;
+        }
+
+        .item-title {
+            font-weight: 600;
+            color: #111;
+            font-size: 1.05em;
+            margin-bottom: 5px;
+        }
+
+        .item-desc {
+            color: #555;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .item-era {
+            display: inline-block;
+            background: #dbeafe;
+            color: #2563eb;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status-todo {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-done {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .usage-note {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+        }
+
+        .usage-note strong {
+            color: #92400e;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8em; }
+            .container { padding: 20px 10px; }
+            .section { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top-Right Hamburger Menu -->
+    <div class="hamburger-menu">
+        <div class="hamburger-button" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <div class="menu-panel" id="menuPanel">
+        <div class="menu-item">
+            <a href="/">🏠 Home</a>
+        </div>
+        <div class="menu-item">
+            <a href="/dashboard/">📊 Dashboard</a>
+        </div>
+        <div class="menu-item">
+            <a href="/youtube/">📺 YouTube Archive</a>
+        </div>
+        <div class="menu-item">
+            <div class="menu-section-title" onclick="toggleSubmenu(this)">
+                🎓 AI Class
+            </div>
+            <div class="submenu">
+                <a href="/ai-class/">Overview</a>
+                <a href="/ai-class/curriculum.html">Curriculum</a>
+            </div>
+        </div>
+        <div class="menu-item">
+            <a href="/spring-break/">🌴 Spring Break</a>
+        </div>
+    </div>
+
+    <!-- Left Sidebar -->
+    <button class="menu-btn" onclick="toggleLeftMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <div class="overlay" onclick="toggleLeftMenu()"></div>
+
+    <nav class="sidebar">
+        <a href="index.html">🏠 Home</a>
+        <h3>Working Documents</h3>
+        <a href="overview.html">📋 Project Overview</a>
+        <a href="curriculum.html">📅 5-Day Curriculum</a>
+        <a href="innovation-history.html" class="active">🔄 Innovation & Fear</a>
+        <a href="final-project.html">🎯 Final Project</a>
+        <a href="exercises.html">🏃 Physical Exercises</a>
+        <a href="chat-app.html">💬 Custom Chat App</a>
+        <a href="showcase.html">🎤 Parent Showcase</a>
+        <a href="forms.html">📝 Forms & Agreements</a>
+        <a href="topics.html">💡 Additional Topics</a>
+        <a href="platforms.html">💻 Chromebook Platforms</a>
+        <a href="ideas.html">🗂️ Ideas Backlog</a>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>🔄 Innovation, Fear & Adaptation</h1>
+            <p class="subtitle">Research List — Day 1 Opening & Day 4 Deep Dive</p>
+        </div>
+
+        <div class="usage-note">
+            <strong>📌 How this fits:</strong> Day 1 opens with this as a slideshow/video — set the tone that fear of new technology is a human pattern, not unique to AI. Day 4 revisits with deeper job impact discussion + ethics. This is the research list — each item needs facts, quotes, images, and data before we build the content.
+        </div>
+
+        <!-- Core Thesis -->
+        <div class="thesis-box">
+            <h2>🎯 The Core Thesis</h2>
+            <ul>
+                <li>Every major innovation triggered fear → displacement → adaptation → net job <em>growth</em></li>
+                <li>The jobs change, not the number of jobs</li>
+                <li>Humans who adapt thrive; resistance delays but doesn't prevent change</li>
+                <li>Fear rhetoric follows the same script every time</li>
+            </ul>
+        </div>
+
+        <!-- Section 1: Innovation Displacing Jobs -->
+        <div class="section">
+            <h2>🔄 Innovation Displacing Jobs (Then Creating New Ones)</h2>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">1</span>Printing Press <span class="item-era">1440s</span> <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">Scribes feared obsolescence. Created: publishers, typesetters, librarians, journalists, entire literacy economy. Find: monk/scribe reactions, timeline of publishing industry growth.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">2</span>Textile Machines / Industrial Revolution <span class="item-era">1760s–1840s</span> <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">Luddites literally destroyed machines. Created: factory jobs, engineering, maintenance, fashion industry scale. Find: Luddite quotes/images, before/after employment numbers.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">3</span>Photography <span class="item-era">1830s</span> <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">"Painting is dead." Created: photojournalism, advertising, film industry, portrait studios. Find: painter reactions, quote from Paul Delaroche, growth of photo industry.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">4</span>Automobile Replacing Horses <span class="item-era">1900s</span> <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">Farriers, stable hands, carriage makers wiped out. Created: mechanics, gas stations, road construction, suburbs, trucking, delivery economy. Find: horse economy stats, job transition timeline.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">5</span>Assembly Line / Ford <span class="item-era">1913</span> <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">Skilled craftsmen replaced by repetitive line work. Created: middle class, affordable goods, quality control jobs, union labor. Find: craftsman displacement stories, $5/day wage impact.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">6</span>Audio Recording / Vinyl Records <span class="item-era">1877+</span> <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">"No one will go see live music." Live music industry is now bigger than ever (~$40B+). Find: musician union protests, John Philip Sousa quotes, live music revenue data.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">7</span>Radio <span class="item-era">1920s</span> <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">"No one will buy records." Records kept selling. Radio created: DJs, broadcasters, advertising industry, music discovery. Find: record industry panic quotes, radio job creation numbers.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">8</span>Television <span class="item-era">1950s</span> <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">"Death of radio, cinema, and reading." All still exist. Created: massive entertainment/production industry. Find: radio/cinema death predictions, TV industry employment growth.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">9</span>ATMs <span class="item-era">1960s–70s</span> <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">"Banks won't need tellers." Bank teller employment actually <em>increased</em> because ATMs made branches cheaper to open → more branches → more tellers. Great counterintuitive example. Find: BLS teller data, branch expansion stats.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">10</span>Spreadsheets / Excel <span class="item-era">1979+</span> <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">"Accountants are done." Accounting profession grew. Created: financial analysts, data-driven business roles. Find: accountant employment before/after VisiCalc, new job categories created.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">11</span>Internet / E-commerce <span class="item-era">1990s</span> <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">"Retail is dead." Retail shifted. Created: web dev, digital marketing, logistics, warehouse, gig economy, entire creator economy. Find: "death of retail" headlines, Amazon/eBay job creation numbers.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">12</span>Streaming Music <span class="item-era">2000s–2010s</span> <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">"Artists can't make money." Live touring revenue exploded, merch economy, direct-to-fan platforms. Find: touring revenue growth charts, Spotify debate vs indie success stories.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">13</span>Self-Checkout / Automation <span class="item-era">2010s</span> <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">Cashier panic. Created: maintenance roles, app developers, curbside pickup teams. Find: cashier employment stats (surprisingly stable), new roles created.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">14</span>Rideshare Replacing Taxis <span class="item-era">2010s</span> <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">Taxi industry disrupted. Created: gig economy, flexible work, mapping/logistics tech jobs. Find: taxi medallion crash, Uber/Lyft driver numbers, new mobility jobs.</div>
+            </div>
+        </div>
+
+        <!-- Section 2: The Fear Cycle -->
+        <div class="section">
+            <h2>😱 The Fear Cycle Pattern (Quotes & Reactions to Find)</h2>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">15</span>Socrates on Writing <span class="item-era">~370 BC</span> <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">Argued writing would destroy memory and true knowledge. The irony: we only know this because Plato <em>wrote it down</em>. Find: exact Phaedrus quote, context.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">16</span>Newspapers on the Telegraph <span class="item-era">1850s</span> <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">Too much information, too fast. Find: actual newspaper editorials warning about the telegraph.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">17</span>Fear of Electricity <span class="item-era">1880s</span> <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">People genuinely afraid to have it in their homes. Find: newspaper warnings, public safety pamphlets, "war of currents" fear-mongering.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">18</span>"Video Killed the Radio Star" <span class="item-era">1980s</span> <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">MTV era panic about radio dying. Radio is still a $20B+ industry. Find: radio death predictions from the MTV era, actual radio revenue data.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">19</span>Y2K Panic <span class="item-era">1999</span> <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">Mass fear of computers failing, civilization collapsing. Find: doomsday headlines, what actually happened, preparation spending ($300B+?).</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">20</span>Social Media Will Destroy Society <span class="item-era">2000s–2010s</span> <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">Still debated, but jobs created: content creators, community managers, influencer economy. Find: early fear headlines, creator economy size ($100B+?).</div>
+            </div>
+        </div>
+
+        <!-- Section 3: AI Energy & Data Center FUD -->
+        <div class="section">
+            <h2>⚡ AI Energy, Water & Data Center Claims</h2>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">21</span>Actual AI Data Center Energy Usage <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">Compare to: streaming video, gaming, traditional banking infrastructure, military. Find: real numbers in context, not just scary headlines.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">22</span>Water Cooling Claims <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">Research actual numbers vs viral headlines. Many data centers use closed-loop cooling or air cooling, not draining municipal water. Find: real cooling methods, actual water consumption per query vs a glass of water, a load of laundry, etc.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">23</span>Historical Energy Panics <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">Electricity was "wasteful" replacing gas lamps. Internet was "going to consume all power" in the 2000s (didn't happen — efficiency improved). Find: past energy panic articles, actual efficiency gains over time.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">24</span>AI Efficiency Gains <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">AI optimizing energy grids, reducing waste in manufacturing, improving crop yields. Net energy impact may be <em>positive</em>. Find: specific examples with numbers.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">25</span>Nuclear/Renewable Investment Driven by AI <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">Tech companies building clean energy specifically because of data center needs. Find: Microsoft/Google/Amazon clean energy commitments, SMR investments.</div>
+            </div>
+        </div>
+
+        <!-- Section 4: Copyright & Training Data Debate -->        <div class="section">            <h2>©️ AI &amp; Copyrighted Training Data</h2>            <div class="research-item">                <div class="item-title"><span class="item-number">30</span>The Core Argument Against <span class="status-badge status-todo">TO RESEARCH</span></div>                <div class="item-desc">AI models trained on books, art, music, code, articles without permission or payment. Artists/writers/coders say this is theft of their work. Find: key lawsuits (NYT vs OpenAI, Getty vs Stability AI, Sarah Silverman case), artist statements, specific examples of near-copies.</div>            </div>            <div class="research-item">                <div class="item-title"><span class="item-number">31</span>The Core Argument For <span class="status-badge status-todo">TO RESEARCH</span></div>                <div class="item-desc">Humans also learn by consuming others' work — every artist studied other artists. AI doesn't store copies, it learns patterns (like a human brain). Fair use has always allowed learning from existing works. Find: fair use legal precedent, how human learning parallels AI training, Google Books case (ruled fair use).</div>            </div>            <div class="research-item">                <div class="item-title"><span class="item-number">32</span>Historical Parallels — Same Fight, Different Era <span class="status-badge status-todo">TO RESEARCH</span></div>                <div class="item-desc">Sampling in hip-hop (sued in the 80s-90s, now licensed &amp; celebrated). VCRs — movie studios sued Sony saying home recording was piracy (Supreme Court said fair use). Napster/MP3s — music industry fought digital, then adapted with Spotify/Apple Music. Find: outcomes of each fight, how industries adapted.</div>            </div>            <div class="research-item">                <div class="item-title"><span class="item-number">33</span>Who's Actually Getting Hurt? <span class="status-badge status-todo">TO RESEARCH</span></div>                <div class="item-desc">Freelance illustrators losing gig work to AI art. Stock photo companies disrupted. Copywriters replaced by ChatGPT. But also: indie creators using AI to compete with big studios. Find: real income impact data, freelancer surveys, which creative jobs are most/least affected.</div>            </div>            <div class="research-item">                <div class="item-title"><span class="item-number">34</span>Who's Benefiting? <span class="status-badge status-todo">TO RESEARCH</span></div>                <div class="item-desc">Solo creators making things that used to require teams. People who can't draw can now visualize ideas. Non-English speakers can write professional English. Kids making games and animations. Find: specific creator stories, democratization examples, accessibility wins.</div>            </div>            <div class="research-item">                <div class="item-title"><span class="item-number">35</span>Where It's Heading — Compensation Models <span class="status-badge status-todo">TO RESEARCH</span></div>                <div class="item-desc">Emerging solutions: opt-in training data marketplaces, creator royalties from AI output, Adobe Firefly's licensed-only training, Shutterstock's contributor fund. Find: current proposals, which companies are paying creators, EU AI Act requirements, pending legislation.</div>            </div>            <div class="research-item">                <div class="item-title"><span class="item-number">36</span>The Nuanced Middle Ground <span class="status-badge status-todo">TO RESEARCH</span></div>                <div class="item-desc">It's not black and white. Training on data may be fair use, but generating work "in the style of" a specific living artist feels different than general learning. There's a difference between learning patterns and copying vibes. Find: examples that show the gray area, legal experts' takes on where lines should be drawn.</div>            </div>        </div>        <!-- Section 5: The Positive Flip Side -->
+        <div class="section">
+            <h2>🌟 The Positive Flip Side</h2>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">26</span>New Jobs AI Is Already Creating <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">Prompt engineering, AI training/RLHF, AI safety, AI-assisted design, AI ops, AI ethics boards. Find: job posting data, salary ranges, growth rates.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">27</span>Accessibility Gains <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">AI translating languages in real-time, assisting disabled users, democratizing education. Find: Be My Eyes + GPT-4, real-time translation examples, Khan Academy AI tutor.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">28</span>Medicine <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">AI diagnosing diseases earlier, drug discovery acceleration. Find: AlphaFold protein structure impact, cancer detection accuracy stats, drug discovery timelines.</div>
+            </div>
+
+            <div class="research-item">
+                <div class="item-title"><span class="item-number">29</span>Creative Tools — One Person Can Do What Teams Did <span class="status-badge status-todo">TO RESEARCH</span></div>
+                <div class="item-desc">AI letting individuals make films, albums, games, businesses. Find: specific creator stories, indie success examples powered by AI tools.</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; padding: 30px; color: #999; font-size: 0.9em;">
+            Last updated: April 29, 2026 · 36 items to research
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const button = document.querySelector('.hamburger-button');
+            const panel = document.getElementById('menuPanel');
+            button.classList.toggle('active');
+            panel.classList.toggle('active');
+        }
+
+        function toggleSubmenu(element) {
+            const submenu = element.nextElementSibling;
+            element.classList.toggle('active');
+            submenu.classList.toggle('active');
+        }
+
+        document.addEventListener('click', function(event) {
+            const menu = document.querySelector('.hamburger-menu');
+            const panel = document.getElementById('menuPanel');
+            const button = document.querySelector('.hamburger-button');
+            const sidebar = document.querySelector('.sidebar');
+            const menuBtn = document.querySelector('.menu-btn');
+            const overlay = document.querySelector('.overlay');
+
+            if (menu && panel && button && !menu.contains(event.target) && !panel.contains(event.target)) {
+                button.classList.remove('active');
+                panel.classList.remove('active');
+            }
+
+            if (sidebar && menuBtn && overlay && !sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('show');
+            }
+        });
+
+        function toggleLeftMenu() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.querySelector('.overlay').classList.toggle('show');
+        }
+    </script>
+</body>
+</html>

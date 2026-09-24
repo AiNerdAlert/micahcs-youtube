@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>showcase - AI Summer Class</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: #2563eb;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            padding: 8px;
+        }
+        
+        .menu-btn span {
+            width: 24px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+        }
+        
+        .menu-btn:hover { background: #1d4ed8; }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: 0.3s;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 80px 20px 20px 20px;
+        }
+        
+        .sidebar.open { left: 0; }
+        
+        .sidebar h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 10px;
+            margin-top: 20px;
+        }
+        
+        .sidebar a {
+            display: block;
+            padding: 10px 15px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            transition: 0.2s;
+        }
+        
+        .sidebar a:hover {
+            background: #f0f0f0;
+            color: #2563eb;
+        }
+        
+        .sidebar a.active {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+        
+        .overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .content {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        h1 {
+            color: #2563eb;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        h2 {
+            color: #333;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #555;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+        
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 20px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        
+        hr {
+            border: none;
+            border-top: 2px solid #e5e7eb;
+            margin: 40px 0;
+        }
+        
+        strong {
+            color: #111;
+            font-weight: 600;
+        }
+        
+        a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .content { padding: 20px; }
+            h1 { font-size: 2em; }
+            h2 { font-size: 1.5em; }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-btn" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <div class="overlay" onclick="toggleMenu()"></div>
+    
+    <nav class="sidebar">
+        <a href="index.html">🏠 Home</a>
+        <h3>Working Documents</h3>
+        <a href="overview.html" class="">📋 Project Overview</a>
+        <a href="curriculum.html" class="">📅 5-Day Curriculum</a>
+        <a href="innovation-history.html">🔄 Innovation &amp; Fear</a>
+        <a href="final-project.html" class="">🎯 Final Project</a>
+        <a href="exercises.html" class="">🏃 Physical Exercises</a>
+        <a href="chat-app.html" class="">💬 Custom Chat App</a>
+        <a href="showcase.html" class="active">🎤 Parent Showcase</a>
+        <a href="forms.html" class="">📝 Forms & Agreements</a>
+        <a href="topics.html" class="">💡 Additional Topics</a>
+        <a href="platforms.html" class="">💻 Chromebook Platforms</a>
+        <a href="ideas.html" class="">🗂️ Ideas Backlog</a>
+    </nav>
+    
+    <div class="container">
+        <div class="content">
+            <p><h1>Parent Showcase (Friday Final Hour)</h1></p><p><strong>When:</strong> Friday, last 45 minutes of class (11:15 AM - 12:00 PM)
+<strong>What:</strong> Nerding's signature "Nerd Showcase" where kids demonstrate what they learned</p><p>---</p><p><h2>🎯 Goals</h2></p><p>1. <strong>Kids show off their projects</strong> - Websites, apps, AI creations they built
+2. <strong>Parents experience AI</strong> - Quick hands-on demo so parents "get it"
+3. <strong>Quick parent education</strong> - Brief overview of what their kids learned
+4. <strong>Impressive demonstration</strong> - Parents see their kids really understand AI
+5. <strong>Take-home materials</strong> - Info packet for parents</p><p>---</p><p><h2>📅 Structure (45 minutes)</h2></p><p><h3>Welcome & Overview (5 min)</h3>
+<ul><li>Welcome parents</li>
+<li>Quick intro: "This week your kids learned AI literacy"</li>
+<li>Set expectations for what they'll see</li></p><p><h3>Parent AI Experience (10-15 min)</h3>
+<li><strong>Option A:</strong> Parents try prompting AI themselves (guided exercise)</li>
+<li><strong>Option B:</strong> Parents interact with kids' projects</li>
+<li><strong>Option C:</strong> Live demo of multimodal AI (image/music/video generation)</li>
+<li><strong>Goal:</strong> Parents understand AI is a TOOL, not magic or scary</li></p><p><h3>Student Project Showcase (20-25 min)</h3>
+<li><strong>Format TBD:</strong></li>
+  - Each kid presents their project? (too long with 20-30 kids)
+  - Gallery walk (parents circulate, kids demo at stations)?
+  - Small group presentations (3-4 kids per group)?
+  - Live on projector (selected highlights)?</p><p><strong>What kids show:</strong>
+<li>The website/app they built</li>
+<li>How it works</li>
+<li>What AI features they used</li>
+<li>What they learned building it</li></p><p><h3>Wrap-Up & Take-Home (5 min)</h3>
+<li>Hand out parent packets</li>
+<li>Explain resources for continued learning</li>
+<li>Q&A if time allows</li>
+<li>Invite feedback</li></p><p>---</p><p><h2>📦 Take-Home Parent Packet</h2></p><p><strong>Contents:</strong>
+1. <strong>What We Learned</strong> - One-page summary of the week's topics
+2. <strong>Resources for Kids</strong> - Safe AI tools they can use at home
+3. <strong>Conversation Starters</strong> - Questions parents can ask their kids
+4. <strong>Responsible AI Use</strong> - Guide for parents on monitoring/supporting
+5. <strong>Further Learning</strong> - Books, websites, videos for families
+6. <strong>Careers in AI</strong> - For kids interested in pursuing this field
+7. <strong>Glossary</strong> - AI terms explained in plain English</p><p><strong>Format:</strong> Printable PDF or physical handout</p><p>---</p><p><h2>🎨 Parent AI Experience Ideas</h2></p><p><h3>Idea 1: Prompt Challenge</h3>
+<li>Parents given a simple task ("Write a poem about pizza")</li>
+<li>They write a prompt for AI</li>
+<li>AI generates response</li>
+<li>Discuss: How could you improve the prompt?</li>
+<li><strong>Teaches:</strong> Prompt engineering basics</li></p><p><h3>Idea 2: Spot the AI</h3>
+<li>Show pairs of images/text (one human-made, one AI)</li>
+<li>Parents guess which is which</li>
+<li>Reveal answers & discuss</li>
+<li><strong>Teaches:</strong> AI capabilities & limitations</li></p><p><h3>Idea 3: Interact with Student Projects</h3>
+<li>Parents sit with their kid</li>
+<li>Kid demonstrates their project</li>
+<li>Parent tries using it</li>
+<li><strong>Teaches:</strong> What their kid actually built</li></p><p><h3>Idea 4: Multimodal Demo</h3>
+<li>Live demonstration of AI creating:</li>
+  - An image from a prompt
+  - A song with Suno
+  - A video clip
+  - Voice cloning
+<li><strong>Teaches:</strong> AI is multimodal, not just chatbots</li></p><p>---</p><p><h2>🖥️ Technical Setup for Showcase</h2></p><p><strong>Need:</strong>
+<li>Projector/screen for overview</li>
+<li>Student computers (or projects accessible via URLs)</li>
+<li>Parent devices? (if doing hands-on)</li>
+<li>Backup demo in case internet fails</li>
+<li>Printed materials ready</li></p><p><strong>If doing gallery walk:</strong>
+<li>Stations set up around room</li>
+<li>Kids at their computers</li>
+<li>Parents rotate through</li></p><p><strong>If doing presentations:</strong>
+<li>Projection setup</li>
+<li>Order of presenters</li>
+<li>Time limits (2-3 min per kid or group)</li></p><p>---</p><p><h2>📋 Showcase Prep Checklist</h2></p><p><strong>Week before:</strong>
+<li>☐ Finalize showcase format</li>
+<li>☐ Prepare parent packet (design & print)</li>
+<li>☐ Test all student projects (make sure URLs work)</li>
+<li>☐ Create presentation slides (if needed)</li>
+<li>☐ Plan parent AI experience activity</li></p><p><strong>Day before:</strong>
+<li>☐ Print parent packets</li>
+<li>☐ Test tech setup in classroom</li>
+<li>☐ Confirm student projects are deployed & accessible</li>
+<li>☐ Prepare backup demo (if internet fails)</li></p><p><strong>Morning of:</strong>
+<li>☐ Set up room (stations or presentation area)</li>
+<li>☐ Test projector/screen</li>
+<li>☐ Have parent packets ready to distribute</li>
+<li>☐ Brief students on showcase flow</li></p><p>---</p><p><h2>💡 Ideas for Making It Impressive</h2></p><p><h3>Student Project Gallery</h3>
+<li>Create a shared page with links to all student projects</li>
+<li>QR code parents can scan to access</li>
+<li>Parents can explore at home after showcase</li></p><p><h3>Live Leaderboard</h3>
+<li>Real-time voting on favorite projects (categories: most creative, most useful, funniest, etc.)</li>
+<li>Display results at end</li>
+<li>Small prizes or certificates?</li></p><p><h3>AI-Generated Showcase Materials</h3>
+<li>Program/agenda designed by AI</li>
+<li>Name tags for students generated with AI art</li>
+<li>Showcase poster with AI imagery</li>
+<li><strong>Meta moment:</strong> "Even our showcase materials were made with AI!"</li></p><p><h3>Video Montage</h3>
+<li>Quick 2-3 minute video of the week</li>
+<li>Clips of kids working, reactions, "aha" moments</li>
+<li>AI-generated music soundtrack (Suno!)</li>
+<li>Play at start of showcase</li></p><p>---</p><p><h2>🎤 Teacher Script Ideas</h2></p><p><h3>Opening</h3>
+> "Welcome! This week, your kids didn't just learn ABOUT AI — they learned to USE it. AI is a tool, and this class taught them how to wield it effectively. Today, they'll show you what they built."</p><p><h3>Before Parent Experience</h3>
+> "Before the kids present, we want YOU to experience AI firsthand. You're going to [describe activity]. Don't worry, there are no wrong answers!"</p><p><h3>Introducing Student Showcase</h3>
+> "Now, the moment we've all been waiting for. Your kids have spent this week building real, working AI-powered projects. Some created websites, some built apps, some generated art and music. Let's see what they made!"</p><p><h3>Closing</h3>
+> "What you saw today is just the beginning. AI is a tool that will shape your kids' futures. We've given them a strong foundation, and the packet you're taking home has resources to keep learning together. Thank you for trusting us with this important education!"</p><p>---</p><p><h2>❓ Potential Parent Questions</h2></p><p><strong>Be ready to answer:</strong>
+<li>"Is AI safe for my kid to use?"</li>
+<li>"How much does this cost to use at home?"</li>
+<li>"Will AI replace my kid's future job?"</li>
+<li>"How do I monitor what they're doing with AI?"</li>
+<li>"What if they use it to cheat on homework?"</li>
+<li>"Can AI be used for bad things?"</li>
+<li>"How does this help them in school?"</li></p><p><strong>Prepare honest, balanced answers in teacher guide</strong></p><p>---</p><p><h2>📊 Gathering Feedback</h2></p><p><strong>From parents (survey/form):</strong>
+<li>Did this showcase help you understand AI?</li>
+<li>What surprised you most?</li>
+<li>Would you enroll your child in another AI class?</li>
+<li>What topics would you like covered next?</li></p><p><strong>From students (verbal or written):</strong>
+<li>What was your favorite part of the week?</li>
+<li>What was hardest?</li>
+<li>Would you recommend this class to a friend?</li>
+<li>What do you want to build with AI next?</li></ul></p><p>---</p><p><strong>Next steps:</strong> Decide on showcase format & parent experience activity after curriculum is more finalized.
+</p>
+        </div>
+    </div>
+    
+    <script>
+        function toggleMenu() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.querySelector('.overlay').classList.toggle('show');
+        }
+    </script>
+</body>
+</html>

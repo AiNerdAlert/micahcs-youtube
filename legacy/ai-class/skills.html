@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skills - AI Summer Class</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        /* Top-Right Hamburger Menu */
+        .hamburger-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .hamburger-button {
+            background: rgba(37, 99, 235, 0.9);
+            border: none;
+            border-radius: 12px;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .hamburger-button:hover {
+            background: rgba(37, 99, 235, 1);
+            transform: scale(1.05);
+        }
+        
+        .hamburger-button span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .hamburger-button.active span:nth-child(1) {
+            transform: rotate(45deg) translate(7px, 7px);
+        }
+        
+        .hamburger-button.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .hamburger-button.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+        
+        .menu-panel {
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 350px;
+            height: 100vh;
+            background: rgba(30, 58, 138, 0.98);
+            backdrop-filter: blur(20px);
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
+            transition: right 0.3s ease;
+            padding: 80px 30px 30px;
+            overflow-y: auto;
+            z-index: 999;
+        }
+        
+        .menu-panel.active {
+            right: 0;
+        }
+        
+        .menu-item {
+            margin-bottom: 15px;
+        }
+        
+        .menu-item a, .menu-item .menu-section-title {
+            display: block;
+            color: white;
+            text-decoration: none;
+            font-size: 1.1em;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-item a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-5px);
+        }
+        
+        .menu-section-title {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+        
+        .menu-section-title:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .menu-section-title::after {
+            content: '▼';
+            font-size: 0.8em;
+            transition: transform 0.3s ease;
+        }
+        
+        .menu-section-title.active::after {
+            transform: rotate(180deg);
+        }
+        
+        .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding-left: 15px;
+        }
+        
+        .submenu.active {
+            max-height: 300px;
+            margin-top: 10px;
+        }
+        
+        .submenu a {
+            font-size: 1em;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .menu-panel {
+                width: 100%;
+                right: -100%;
+            }
+        }
+        
+        /* Left Hamburger Menu */
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: #2563eb;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            padding: 8px;
+        }
+        
+        .menu-btn span {
+            width: 24px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+            transition: 0.3s;
+        }
+        
+        .menu-btn:hover { background: #1d4ed8; }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: 0.3s;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 80px 20px 20px 20px;
+        }
+        
+        .sidebar.open { left: 0; }
+        
+        .sidebar h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 10px;
+            margin-top: 20px;
+        }
+        
+        .sidebar a {
+            display: block;
+            padding: 10px 15px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            transition: 0.2s;
+        }
+        
+        .sidebar a:hover {
+            background: #f0f0f0;
+            color: #2563eb;
+        }
+        
+        .sidebar a.active {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+        
+        .overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        /* Main Content */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        header {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        h1 {
+            font-size: 2em;
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .intro-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .intro-box h2 {
+            font-size: 1.4em;
+            margin-bottom: 15px;
+        }
+        
+        .intro-box p {
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+        
+        .phase-section {
+            margin-bottom: 40px;
+        }
+        
+        .phase-header {
+            background: #2563eb;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px 10px 0 0;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+        
+        .phase-header span {
+            opacity: 0.8;
+            font-weight: normal;
+            font-size: 0.9em;
+        }
+        
+        .skill-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+            padding: 25px;
+            border-radius: 0 0 10px 10px;
+        }
+        
+        .skill-card + .skill-card {
+            border-radius: 0;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .skill-card:last-child {
+            border-radius: 0 0 10px 10px;
+        }
+        
+        .skill-name {
+            font-size: 1.3em;
+            color: #1f2937;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .skill-name .emoji {
+            font-size: 1.4em;
+        }
+        
+        .skill-summary {
+            color: #4b5563;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .skill-features {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .skill-features h4 {
+            font-size: 0.85em;
+            text-transform: uppercase;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+        
+        .skill-features ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 8px;
+        }
+        
+        .skill-features li {
+            color: #374151;
+            font-size: 0.95em;
+        }
+        
+        .skill-features li::before {
+            content: "✓ ";
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .skill-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .skill-links a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: #f3f4f6;
+            color: #374151;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            transition: 0.2s;
+        }
+        
+        .skill-links a:hover {
+            background: #e5e7eb;
+            color: #2563eb;
+        }
+        
+        .install-section {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.85em;
+            overflow-x: auto;
+        }
+        
+        .install-section h4 {
+            color: #9ca3af;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .install-section code {
+            display: block;
+            padding: 4px 0;
+            color: #a5f3fc;
+        }
+        
+        .install-section .comment {
+            color: #6b7280;
+        }
+        
+        .when-to-use {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 15px;
+        }
+        
+        .when-to-use h4 {
+            color: #92400e;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+        
+        .when-to-use p {
+            color: #78350f;
+            font-size: 0.95em;
+        }
+        
+        .coming-soon {
+            background: #f3f4f6;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            color: #6b7280;
+        }
+        
+        .coming-soon h3 {
+            color: #374151;
+            margin-bottom: 10px;
+        }
+        
+        .shipkit-note {
+            background: #ecfdf5;
+            border: 1px solid #6ee7b7;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .shipkit-note h3 {
+            color: #047857;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .shipkit-note p {
+            color: #065f46;
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 1.6em; }
+            .container { padding: 20px 15px; }
+            header { padding: 25px; }
+            .skill-features ul {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top-Right Hamburger Menu (Main Site Navigation) -->
+    <div class="hamburger-menu">
+        <div class="hamburger-button" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+    
+    <div class="menu-panel" id="menuPanel">
+        <div class="menu-item">
+            <a href="/">🏠 Home</a>
+        </div>
+        <div class="menu-item">
+            <a href="/dashboard/">📊 Dashboard</a>
+        </div>
+        <div class="menu-item">
+            <a href="/youtube/">📺 YouTube Archive</a>
+        </div>
+        <div class="menu-item">
+            <div class="menu-section-title" onclick="toggleSubmenu(this)">
+                🎓 AI Class
+            </div>
+            <div class="submenu">
+                <a href="/ai-class/">Overview</a>
+                <a href="/ai-class/curriculum.html">Curriculum</a>
+                <a href="/ai-class/skills.html">Skills</a>
+            </div>
+        </div>
+        <div class="menu-item">
+            <a href="/spring-break/">🌴 Spring Break</a>
+        </div>
+    </div>
+    
+    <!-- Left Sidebar Menu (AI Class Documents) -->
+    <button class="menu-btn" onclick="toggleLeftMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <div class="overlay" onclick="toggleMenu()"></div>
+    
+    <nav class="sidebar">
+        <h3>Working Documents</h3>
+        <a href="overview.html">📋 Project Overview</a>
+        <a href="curriculum.html">📅 5-Day Curriculum</a>
+        <a href="innovation-history.html">🔄 Innovation &amp; Fear</a>
+        <a href="skills.html" class="active">🛠️ Skills</a>
+        <a href="final-project.html">🎯 Final Project</a>
+        <a href="exercises.html">🏃 Physical Exercises</a>
+        <a href="chat-app.html">💬 Custom Chat App</a>
+        <a href="showcase.html">🎤 Parent Showcase</a>
+        <a href="forms.html">📝 Forms & Agreements</a>
+        <a href="topics.html">💡 Additional Topics</a>
+        <a href="platforms.html">💻 Chromebook Platforms</a>
+        <a href="ideas.html">🗂️ Ideas Backlog</a>
+    </nav>
+    
+    <div class="container">
+        <header>
+            <h1>🛠️ AI Development Skills</h1>
+            <p class="subtitle">Claude Code skills students will use during the software development process</p>
+        </header>
+        
+        <div class="intro-box">
+            <h2>What Are Skills?</h2>
+            <p>Skills are like "power-ups" for AI coding assistants. They teach the AI specialized knowledge about specific tasks - like brainstorming, design, or debugging. Instead of explaining everything from scratch each time, skills give the AI instant expertise.</p>
+        </div>
+        
+        <div class="shipkit-note">
+            <h3>📦 Part of ShipKit</h3>
+            <p>These skills align with our <strong>ShipKit</strong> development framework - a structured approach to building software. Each skill maps to a specific phase in the development process: Planning → Design → Build → Test → Deploy.</p>
+        </div>
+        
+        <!-- SKILL LIBRARIES -->
+        <div class="phase-section">
+            <div class="phase-header" style="background: #7c3aed;">
+                📚 Skill Libraries <span>— Collections of related skills</span>
+            </div>
+            
+            <div class="skill-card">
+                <h3 class="skill-name">
+                    <span class="emoji">⚡</span>
+                    Obra Superpowers
+                </h3>
+                
+                <p class="skill-summary">
+                    A complete software development workflow built on composable skills. Created by Jesse Vincent (obra), this library doesn't just give you individual skills - it gives you an entire <strong>methodology</strong> for building software with AI. The skills trigger automatically based on what you're doing.
+                </p>
+                
+                <div class="skill-features">
+                    <h4>How It Works</h4>
+                    <ul>
+                        <li>Starts with questions, not code</li>
+                        <li>Creates design spec from conversation</li>
+                        <li>Builds implementation plan</li>
+                        <li>Uses subagents for each task</li>
+                        <li>Enforces test-driven development</li>
+                        <li>Reviews work automatically</li>
+                    </ul>
+                </div>
+                
+                <div class="skill-features">
+                    <h4>Skills Included</h4>
+                    <ul>
+                        <li><strong>brainstorming</strong> - Plan before coding</li>
+                        <li><strong>writing-plans</strong> - Implementation plans</li>
+                        <li><strong>test-driven-development</strong> - RED-GREEN-REFACTOR</li>
+                        <li><strong>systematic-debugging</strong> - 4-phase debugging</li>
+                        <li><strong>using-git-worktrees</strong> - Parallel branches</li>
+                        <li><strong>subagent-driven-development</strong> - Task delegation</li>
+                        <li><strong>requesting-code-review</strong> - Quality checks</li>
+                        <li><strong>writing-skills</strong> - Create new skills</li>
+                    </ul>
+                </div>
+                
+                <div class="skill-links">
+                    <a href="https://github.com/obra/superpowers" target="_blank">
+                        📁 GitHub Repository
+                    </a>
+                    <a href="https://skills.sh/obra/superpowers" target="_blank">
+                        🔗 Skills.sh Page
+                    </a>
+                    <a href="https://blog.fsck.com/2025/10/09/superpowers/" target="_blank">
+                        📖 Blog Post (Philosophy)
+                    </a>
+                </div>
+                
+                <div class="install-section">
+                    <h4>Installation (Claude Code)</h4>
+                    <code class="comment"># Step 1: Add the marketplace</code>
+                    <code>/plugin marketplace add obra/superpowers-marketplace</code>
+                    <code></code>
+                    <code class="comment"># Step 2: Install the plugin</code>
+                    <code>/plugin install superpowers@superpowers-marketplace</code>
+                    <code></code>
+                    <code class="comment"># Step 3: Verify (start new session, ask to plan something)</code>
+                    <code>"help me plan this feature"</code>
+                </div>
+                
+                <div class="when-to-use">
+                    <h4>📍 Why We Use This</h4>
+                    <p>This is our <strong>primary skill library</strong> for the class. It teaches students the right way to work with AI: plan first, test your work, review before moving on. Individual skills below (like Brainstorming) come from this library.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- PLANNING PHASE -->
+        <div class="phase-section">
+            <div class="phase-header">
+                📋 Planning Phase <span>— Before writing any code</span>
+            </div>
+            
+            <div class="skill-card">
+                <h3 class="skill-name">
+                    <span class="emoji">🧠</span>
+                    Brainstorming <span style="font-size: 0.7em; color: #6b7280; font-weight: normal;">(from Obra Superpowers)</span>
+                </h3>
+                
+                <p class="skill-summary">
+                    A structured brainstorming skill that helps you plan BEFORE coding. Part of the <strong>Obra Superpowers</strong> library, it asks thoughtful questions to understand your intent, requirements, and design - then creates an implementation summary you can hand off to the AI to build.
+                </p>
+                
+                <div class="skill-features">
+                    <h4>What it does</h4>
+                    <ul>
+                        <li>Asks clarifying questions</li>
+                        <li>Explores requirements</li>
+                        <li>Identifies edge cases</li>
+                        <li>Creates implementation plan</li>
+                        <li>Prevents scope creep</li>
+                        <li>Documents decisions</li>
+                    </ul>
+                </div>
+                
+                <div class="skill-links">
+                    <a href="https://github.com/obra/superpowers" target="_blank">
+                        📁 GitHub Repository
+                    </a>
+                    <a href="https://skills.sh/obra/superpowers/brainstorming" target="_blank">
+                        🔗 Skills.sh Page
+                    </a>
+                </div>
+                
+                <div class="install-section">
+                    <h4>Installation</h4>
+                    <code class="comment"># Using Claude Code marketplace</code>
+                    <code>/plugin marketplace add obra/superpowers</code>
+                    <code>/plugin install brainstorming@superpowers</code>
+                </div>
+                
+                <div class="when-to-use">
+                    <h4>📍 When Students Will Use This</h4>
+                    <p><strong>Day 2-3:</strong> Before starting their app project. Students will use this skill to brainstorm their app idea, define features, and create a plan before writing any code.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- DESIGN PHASE -->
+        <div class="phase-section">
+            <div class="phase-header">
+                🎨 Design Phase <span>— Making it look professional</span>
+            </div>
+            
+            <div class="skill-card">
+                <h3 class="skill-name">
+                    <span class="emoji">✨</span>
+                    UI/UX Pro Max
+                </h3>
+                
+                <p class="skill-summary">
+                    An AI-powered design intelligence skill that automatically generates complete design systems. Tell it what you're building, and it recommends styles, colors, fonts, and layout patterns based on your industry and goals.
+                </p>
+                
+                <div class="skill-features">
+                    <h4>What it includes</h4>
+                    <ul>
+                        <li>67 UI styles (Glassmorphism, Minimalist, etc.)</li>
+                        <li>96 color palettes by industry</li>
+                        <li>57 font pairings with Google Fonts</li>
+                        <li>100 industry-specific rules</li>
+                        <li>Auto design system generation</li>
+                        <li>Accessibility guidelines (WCAG)</li>
+                    </ul>
+                </div>
+                
+                <div class="skill-links">
+                    <a href="https://github.com/nextlevelbuilder/ui-ux-pro-max-skill" target="_blank">
+                        📁 GitHub Repository
+                    </a>
+                    <a href="https://skills.sh/nextlevelbuilder/ui-ux-pro-max-skill/ui-ux-pro-max" target="_blank">
+                        🔗 Skills.sh Page
+                    </a>
+                    <a href="https://uupm.cc" target="_blank">
+                        🌐 Official Website
+                    </a>
+                </div>
+                
+                <div class="install-section">
+                    <h4>Installation (CLI Method)</h4>
+                    <code class="comment"># Install the CLI tool</code>
+                    <code>npm install -g uipro-cli</code>
+                    <code></code>
+                    <code class="comment"># Initialize in your project</code>
+                    <code>cd your-project</code>
+                    <code>uipro init --ai claude</code>
+                </div>
+                
+                <div class="when-to-use">
+                    <h4>📍 When Students Will Use This</h4>
+                    <p><strong>Day 3-4:</strong> After planning, when students start designing their app's look and feel. The skill will generate a complete design system (colors, fonts, style) based on what kind of app they're building.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- BUILD PHASE (Coming Soon) -->
+        <div class="phase-section">
+            <div class="phase-header">
+                🔨 Build Phase <span>— Writing the code</span>
+            </div>
+            
+            <div class="coming-soon">
+                <h3>Skills Coming Soon</h3>
+                <p>We're evaluating additional skills for the build phase including debugging, code review, and framework-specific helpers.</p>
+            </div>
+        </div>
+        
+        <!-- TEST PHASE (Coming Soon) -->
+        <div class="phase-section">
+            <div class="phase-header">
+                🧪 Test Phase <span>— Making sure it works</span>
+            </div>
+            
+            <div class="coming-soon">
+                <h3>Skills Coming Soon</h3>
+                <p>Testing and quality assurance skills will be added here.</p>
+            </div>
+        </div>
+        
+        <!-- DEPLOY PHASE (Coming Soon) -->
+        <div class="phase-section">
+            <div class="phase-header">
+                🚀 Deploy Phase <span>— Sharing with the world</span>
+            </div>
+            
+            <div class="coming-soon">
+                <h3>Skills Coming Soon</h3>
+                <p>Deployment and hosting skills will be added here.</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function toggleMenu() {
+            const button = document.querySelector('.hamburger-button');
+            const panel = document.getElementById('menuPanel');
+            button.classList.toggle('active');
+            panel.classList.toggle('active');
+        }
+        
+        function toggleSubmenu(element) {
+            const submenu = element.nextElementSibling;
+            element.classList.toggle('active');
+            submenu.classList.toggle('active');
+        }
+        
+        document.addEventListener('click', function(event) {
+            const menu = document.querySelector('.hamburger-menu');
+            const panel = document.getElementById('menuPanel');
+            const button = document.querySelector('.hamburger-button');
+            const sidebar = document.querySelector('.sidebar');
+            const menuBtn = document.querySelector('.menu-btn');
+            const overlay = document.querySelector('.overlay');
+            
+            if (menu && panel && button && !menu.contains(event.target) && !panel.contains(event.target)) {
+                button.classList.remove('active');
+                panel.classList.remove('active');
+            }
+            
+            if (sidebar && menuBtn && overlay && !sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('show');
+            }
+        });
+        
+        function toggleLeftMenu() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.querySelector('.overlay').classList.toggle('show');
+        }
+    </script>
+</body>
+</html>

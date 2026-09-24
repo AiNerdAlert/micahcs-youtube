@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>platforms - AI Summer Class</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: #2563eb;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            padding: 8px;
+        }
+        
+        .menu-btn span {
+            width: 24px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+        }
+        
+        .menu-btn:hover { background: #1d4ed8; }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: 0.3s;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 80px 20px 20px 20px;
+        }
+        
+        .sidebar.open { left: 0; }
+        
+        .sidebar h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 10px;
+            margin-top: 20px;
+        }
+        
+        .sidebar a {
+            display: block;
+            padding: 10px 15px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            transition: 0.2s;
+        }
+        
+        .sidebar a:hover {
+            background: #f0f0f0;
+            color: #2563eb;
+        }
+        
+        .sidebar a.active {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+        
+        .overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .content {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        h1 {
+            color: #2563eb;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        h2 {
+            color: #333;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #555;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+        
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 20px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        
+        hr {
+            border: none;
+            border-top: 2px solid #e5e7eb;
+            margin: 40px 0;
+        }
+        
+        strong {
+            color: #111;
+            font-weight: 600;
+        }
+        
+        a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .content { padding: 20px; }
+            h1 { font-size: 2em; }
+            h2 { font-size: 1.5em; }
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-btn" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    
+    <div class="overlay" onclick="toggleMenu()"></div>
+    
+    <nav class="sidebar">
+        <a href="index.html">🏠 Home</a>
+        <h3>Working Documents</h3>
+        <a href="overview.html" class="">📋 Project Overview</a>
+        <a href="curriculum.html" class="">📅 5-Day Curriculum</a>
+        <a href="innovation-history.html">🔄 Innovation &amp; Fear</a>
+        <a href="final-project.html" class="">🎯 Final Project</a>
+        <a href="exercises.html" class="">🏃 Physical Exercises</a>
+        <a href="chat-app.html" class="">💬 Custom Chat App</a>
+        <a href="showcase.html" class="">🎤 Parent Showcase</a>
+        <a href="forms.html" class="">📝 Forms & Agreements</a>
+        <a href="topics.html" class="">💡 Additional Topics</a>
+        <a href="platforms.html" class="active">💻 Chromebook Platforms</a>
+        <a href="ideas.html" class="">🗂️ Ideas Backlog</a>
+    </nav>
+    
+    <div class="container">
+        <div class="content">
+            <p><h1>Chromebook-Friendly Build Platforms</h1></p><p><strong>Constraint:</strong> 20-30 kids with Chromebooks, need to build & deploy something</p><p>---</p><p><h2>✅ Top Recommendations</h2></p><p><h3>1. <strong>Replit</strong> (⭐ Best Choice)</h3>
+<strong>What it is:</strong> Full-featured online IDE (code editor) with instant deployment</p><p><strong>Why it's perfect:</strong>
+<ul><li>Works 100% in browser (Chromebook-friendly)</li>
+<li>Built-in AI features (Replit Agent can help students code)</li>
+<li>One-click deployment (every project gets a live URL)</li>
+<li>Free tier available</li>
+<li>Supports many languages (HTML/CSS/JS, Python, Node.js, etc.)</li>
+<li>Collaborative (students can share/remix projects)</li>
+<li>Teacher can create a Replit Team for class management</li></p><p><strong>What students could build:</strong>
+<li>Interactive website</li>
+<li>Simple web app</li>
+<li>Chatbot interface</li>
+<li>AI-powered tool (using API calls)</li></p><p><strong>Pricing:</strong>
+<li>Free tier: Works for basic projects</li>
+<li>Replit Core: $10/month (optional, adds AI features)</li>
+<li>Replit Teams for Education: Special pricing for classrooms</li></p><p><strong>Setup:</strong>
+<li>Students create free accounts</li>
+<li>Or: Teacher creates class team with shared projects</li></p><p>---</p><p><h3>2. <strong>Glitch</strong></h3>
+<strong>What it is:</strong> Browser-based coding platform for web apps</p><p><strong>Why it's good:</strong>
+<li>Fully browser-based (perfect for Chromebooks)</li>
+<li>Instant live preview</li>
+<li>Easy remixing (students can copy/modify examples)</li>
+<li>Free hosting included</li>
+<li>Friendly for beginners</li>
+<li>Good community with starter templates</li></p><p><strong>What students could build:</strong>
+<li>Website with HTML/CSS/JS</li>
+<li>Node.js web app</li>
+<li>API integration projects</li></p><p><strong>Pricing:</strong>
+<li>Free tier: More than enough for class projects</li></p><p><strong>Setup:</strong>
+<li>Students create free accounts</li>
+<li>Can work anonymously (no account needed for basic use)</li></p><p>---</p><p><h3>3. <strong>Google Colab</strong> (For AI Experiments)</h3>
+<strong>What it is:</strong> Browser-based Python notebooks (like a coding playground)</p><p><strong>Why it's useful:</strong>
+<li>Great for AI/ML experiments</li>
+<li>Free access to GPUs (for running AI models)</li>
+<li>No installation needed</li>
+<li>Integrated with Google Drive</li>
+<li>Interactive code cells (run code chunk by chunk)</li></p><p><strong>What students could do:</strong>
+<li>Interact with AI APIs (OpenAI, HuggingFace)</li>
+<li>Train simple ML models with Teachable Machine exports</li>
+<li>Data analysis & visualization</li>
+<li>Text generation experiments</li></p><p><strong>Pricing:</strong>
+<li>Free tier: Plenty for classroom use</li>
+<li>Colab Pro: $10/month (optional, more compute)</li></p><p><strong>Setup:</strong>
+<li>Students need Google accounts (likely already have for school)</li></p><p>---</p><p><h3>4. <strong>CodePen</strong></h3>
+<strong>What it is:</strong> Online HTML/CSS/JS editor with instant preview</p><p><strong>Why it's good:</strong>
+<li>Super simple interface</li>
+<li>No setup, works immediately</li>
+<li>Perfect for front-end web projects</li>
+<li>Great for learning HTML/CSS/JS basics</li>
+<li>Can embed results anywhere</li></p><p><strong>What students could build:</strong>
+<li>Interactive webpage</li>
+<li>Simple animations</li>
+<li>Form interfaces</li>
+<li>Visual projects</li></p><p><strong>Pricing:</strong>
+<li>Free tier: Works fine for class</li></p><p><strong>Limitations:</strong>
+<li>Only front-end (no backend/server code)</li>
+<li>Better for simple web pages than full apps</li></p><p>---</p><p><h3>5. <strong>Teachable Machine</strong> (For AI Training)</h3>
+<strong>What it is:</strong> Google's visual tool for training simple AI models</p><p><strong>Why it's cool:</strong>
+<li>No coding required to train a model</li>
+<li>Use webcam to train image/sound/pose recognition</li>
+<li>Export model and use in projects</li>
+<li>Great for demonstrating "how AI learns"</li></p><p><strong>What students could do:</strong>
+<li>Train an image classifier (rock/paper/scissors detector)</li>
+<li>Train a sound recognizer</li>
+<li>Train a pose detector</li>
+<li>Export and embed in a website</li></p><p><strong>Pricing:</strong>
+<li>Completely free</li></p><p><strong>Setup:</strong>
+<li>Just visit the website, no account needed</li>
+<li>Can save projects to Google Drive</li></p><p>---</p><p><h2>🎯 Recommended Project Path</h2></p><p><h3>Option A: Build an AI-Powered Webpage (Easiest)</h3>
+<strong>Platform:</strong> Replit or Glitch  
+<strong>What:</strong> Interactive website that calls an AI API</p><p><strong>Example project:</strong>
+<li>Students build a webpage with a text box</li>
+<li>User types a question</li>
+<li>JavaScript sends it to an AI API (ChatGPT, Claude, etc.)</li>
+<li>AI response displays on the page</li></p><p><strong>Skills learned:</strong>
+<li>HTML structure</li>
+<li>CSS styling</li>
+<li>JavaScript basics</li>
+<li>API calls</li>
+<li>Deployment</li></p><p><strong>Time:</strong> Can complete in 2-3 hours with guidance</p><p>---</p><p><h3>Option B: Train & Deploy Custom AI (More Advanced)</h3>
+<strong>Platforms:</strong> Teachable Machine + Replit/Glitch  
+<strong>What:</strong> Train a simple AI model, build webpage that uses it</p><p><strong>Example project:</strong>
+<li>Use Teachable Machine to train image classifier</li>
+<li>Export model</li>
+<li>Build webpage that uses device camera</li>
+<li>Model recognizes what it sees in real-time</li></p><p><strong>Skills learned:</strong>
+<li>How AI training works (hands-on)</li>
+<li>Image recognition</li>
+<li>Model deployment</li>
+<li>Web development</li></p><p><strong>Time:</strong> 4-5 hours (spread across multiple days)</p><p>---</p><p><h3>Option C: AI Chatbot Builder (Intermediate)</h3>
+<strong>Platform:</strong> Replit with AI APIs  
+<strong>What:</strong> Build a custom chatbot with personality</p><p><strong>Example project:</strong>
+<li>Students create a chatbot with specific role (teacher, game character, etc.)</li>
+<li>Use system prompts to shape personality</li>
+<li>Build simple web interface</li>
+<li>Deploy live</li></p><p><strong>Skills learned:</strong>
+<li>Prompt engineering</li>
+<li>System prompts</li>
+<li>Web development</li>
+<li>API integration</li></p><p><strong>Time:</strong> 3-4 hours</p><p>---</p><p><h2>🔐 Account & Safety Considerations</h2></p><p><h3>API Keys</h3>
+<strong>Challenge:</strong> Students shouldn't have direct access to API keys (costs money, security risk)</p><p><strong>Solutions:</strong>
+1. <strong>Teacher-controlled backend:</strong> Build a simple proxy server that students call (hides real API key)
+2. <strong>Shared demo account:</strong> Teacher creates one Replit project with key, students remix/copy (but don't see key)
+3. <strong>Free tier APIs:</strong> Use services with generous free tiers (HuggingFace Inference API is free)
+4. <strong>Pre-loaded responses:</strong> For demos, use pre-made responses (not real API calls)</p><p><h3>Student Accounts</h3>
+<strong>Options:</strong>
+1. Students create free accounts (need email)
+2. Teacher creates class accounts (burner emails)
+3. Use anonymous/guest mode where available (Glitch, CodePen)
+4. Google accounts (likely already have for school)</p><p>---</p><p><h2>🛠️ Setup Checklist for Class</h2></p><p><strong>Before Class:</strong>
+<li>☐ Choose platform (recommend Replit)</li>
+<li>☐ Test a sample project yourself</li>
+<li>☐ Create teacher account + class team (if applicable)</li>
+<li>☐ Prepare starter template students can remix</li>
+<li>☐ Test on actual Chromebook to confirm it works</li>
+<li>☐ Get API keys if needed (and hide them properly)</li>
+<li>☐ Prepare backup plan if internet is slow</li></p><p><strong>During Class:</strong>
+<li>☐ Have students create accounts (or use prepared ones)</li>
+<li>☐ Walk through platform interface together</li>
+<li>☐ Share starter template link</li>
+<li>☐ Live-code the first parts together</li>
+<li>☐ Let students customize/experiment</li>
+<li>☐ Help with debugging</li>
+<li>☐ Deploy & share results!</li></p><p>---</p><p><h2>💡 Quick Wins</h2></p><p>If time is tight or students struggle, these are FAST wins:</p><p><h3>5-Minute Win: Remix & Customize</h3>
+<li>Teacher prepares fully working project</li>
+<li>Students remix/copy it</li>
+<li>They just change colors, text, prompts</li>
+<li>Still deployed and "theirs"</li></p><p><h3>15-Minute Win: Form + Response</h3>
+<li>HTML form with input box</li>
+<li>JavaScript that takes input and displays it back (no AI needed)</li>
+<li>Teaches basics, feels interactive</li></p><p><h3>30-Minute Win: API Integration</h3>
+<li>Use starter code that already has API set up</li>
+<li>Students just modify the prompt/system message</li>
+<li>See how different prompts get different responses</li></p><p>---</p><p><h2>🎨 Student Showcase</h2></p><p>End-of-week idea:
+<li>Each student (or team) deploys their project</li>
+<li>They get a live URL</li>
+<li>Class votes on favorites (categories: most creative, funniest, most useful, etc.)</li>
+<li>Students take home their URLs to show parents</li></ul></p><p>---</p><p><strong>Bottom line:</strong> Replit is probably your best bet. Free, browser-based, AI-assisted coding built-in, instant deployment, and classroom-friendly.</p><p>Want me to mock up a sample starter project?
+</p>
+        </div>
+    </div>
+    
+    <script>
+        function toggleMenu() {
+            document.querySelector('.sidebar').classList.toggle('open');
+            document.querySelector('.overlay').classList.toggle('show');
+        }
+    </script>
+</body>
+</html>

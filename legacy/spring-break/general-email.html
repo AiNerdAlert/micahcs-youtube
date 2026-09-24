@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>General Email Preview | Spring Break</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 1rem; }
+        
+        /* Hamburger Menu Navigation */
+        .hamburger {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1000;
+            background: #F69658;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: background 0.3s;
+        }
+        
+        .hamburger:hover {
+            background: #e67e40;
+        }
+        
+        .nav-menu {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+            z-index: 999;
+            padding: 5rem 0 2rem 0;
+        }
+        
+        .nav-menu.open {
+            left: 0;
+        }
+        
+        .nav-menu a {
+            display: block;
+            padding: 1rem 2rem;
+            color: #2c3e50;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: background 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .nav-menu a:hover {
+            background: #f8f9fa;
+            border-left-color: #F69658;
+        }
+        
+        .nav-menu a.active {
+            background: linear-gradient(90deg, rgba(246,150,88,0.1) 0%, transparent 100%);
+            border-left-color: #F69658;
+            font-weight: 600;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: 998;
+        }
+        
+        .overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .email-preview { max-width: 600px; margin: 2rem auto; background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 20px rgba(0,0,0,0.1); }
+        .email-header { background: #F69658; color: white; padding: 1.5rem; margin: -2rem -2rem 2rem -2rem; border-radius: 10px 10px 0 0; text-align: center; }
+        .email-header .logo { width: 80px; height: auto; margin: 0 auto 1rem; display: block; }
+        .email-header h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        .email-subject { background: #f8f9fa; padding: 1rem; border-left: 4px solid #F69658; margin-bottom: 2rem; }
+        .email-body { line-height: 1.8; color: #333; }
+        .email-body h2 { color: #2c3e50; margin: 2rem 0 1rem 0; font-size: 1.5rem; border-bottom: 2px solid #F69658; padding-bottom: 0.5rem; }
+        .email-body h3 { color: #F69658; margin: 1.5rem 0 0.5rem 0; }
+        .discount-box { background: linear-gradient(135deg, #F69658 0%, #7bdcb5 100%); color: white; padding: 1.5rem; border-radius: 8px; margin: 2rem 0; text-align: center; }
+        .discount-box .price { font-size: 2rem; font-weight: bold; margin: 1rem 0; }
+        .cta-button { background: #F69658; color: white; padding: 1rem 2rem; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: bold; margin: 1rem 0; }
+        .schedule { background: #f8f9fa; padding: 1rem; border-radius: 5px; margin: 1rem 0; }
+        ul { margin: 1rem 0 1rem 2rem; }
+        li { margin: 0.5rem 0; }
+        
+        @media (max-width: 768px) {
+            .email-preview { padding: 1rem; }
+            .email-header { padding: 1rem; margin: -1rem -1rem 1rem -1rem; }
+            .email-header h1 { font-size: 1.5rem; }
+            .email-header .logo { width: 60px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hamburger Menu Button -->
+    <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">☰</button>
+    
+    <!-- Navigation Menu -->
+    <nav class="nav-menu" id="navMenu">
+        <a href="index.html">Spring Break Home</a>
+        <a href="path-email.html">Path Email (Full)</a>
+        <a href="path-email-short.html">Path Email (Short)</a>
+        <a href="general-email.html" class="active">General Email</a>
+        <a href="survey.html">Survey Form</a>
+    </nav>
+    
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <div class="email-preview">
+        <div class="email-header">
+            <img src="nerding-bulb-logo.svg" alt="Nerding Logo" class="logo">
+            <h1>📧 General Email Preview</h1>
+            <p style="font-size: 0.9rem; opacity: 0.9;">For Nerding mailing list & Enterprise families</p>
+        </div>
+
+        <div class="email-subject">
+            <strong>Subject:</strong> 🚀 Spring Break STEM Camp is Coming? Help Us Plan (Discount Inside)
+        </div>
+
+        <div class="email-body">
+            <p>Hi Nerding Families!</p>
+
+            <p>Spring break is around the corner, and we're planning something exciting! We're bringing our hands-on STEM classes to Gilbert for a week of learning, creating, and fun. 🎉</p>
+
+            <h2>🚀 Spring Break STEM Camp</h2>
+            <p><strong>March 9-13, 2026</strong> (Monday-Friday)<br>
+            <strong>331 S Cooper Rd, Gilbert, AZ 85233</strong></p>
+
+            <p>We want to make sure we're offering exactly what YOUR nerd wants to learn, so we need your help!</p>
+
+            <h2>🎨 Choose Your Adventure</h2>
+
+            <h3>3D Printing (Grades 3-7)</h3>
+            <img src="images/banner-3d-printing.jpg" alt="3D Printing Class" style="width: 100%; max-width: 100%; height: auto; border-radius: 8px; margin-bottom: 1rem;">
+            <p>Design, create, and print your own 3D creations! Whether your nerd is brand new to 3D printing or already loves it, this camp meets them where they are. We're doing fresh, NEW design challenges!</p>
+            <p><a href="https://nerding.org/3d-printing/" style="color: #F69658; text-decoration: none; font-weight: 500;">→ More class details</a></p>
+
+            <h3>Escape Lost Cities (Grades 3-7)</h3>
+            <img src="images/banner-escape.jpg" alt="Escape Lost Cities Class" style="width: 100%; max-width: 100%; height: auto; border-radius: 8px; margin-bottom: 1rem;">
+            <p>A week-long adventure of puzzles, codes, and teamwork! Unlock puzzle boxes with various locks, solve challenges, explore mysterious cities, and use STEM skills wrapped in fun. Plus, parents get to solve puzzle challenges WITH their kids on Friday!</p>
+            <p><a href="https://nerding.org/escape-lost-cities/" style="color: #F69658; text-decoration: none; font-weight: 500;">→ More class details</a></p>
+
+            <h3>Space Explorers (Grades 1-2) <em>if enough interest</em></h3>
+            <img src="images/banner-space.jpg" alt="Space Explorers Class" style="width: 100%; max-width: 100%; height: auto; border-radius: 8px; margin-bottom: 1rem;">
+            <p>Our littlest nerds blast off into space exploration through hands-on activities, experiments, and maker projects!</p>
+            <p><a href="https://nerding.org/space-explorers/" style="color: #F69658; text-decoration: none; font-weight: 500;">→ More class details</a></p>
+
+            <h2>⏰ Flexible Schedule Options</h2>
+            <div class="schedule">
+                <p><strong>Half-Day Options:</strong></p>
+                <ul>
+                    <li><strong>Morning:</strong> 9:00 AM - 12:00 PM</li>
+                    <li><strong>Afternoon:</strong> 1:00 PM - 4:00 PM</li>
+                </ul>
+
+                <p><strong>All-Day Option:</strong></p>
+                <ul>
+                    <li>Take BOTH morning AND afternoon classes!</li>
+                    <li>Drop-off: 9:00 AM | Pick-up: 4:00 PM</li>
+                    <li>Includes supervised lunch break with playground time</li>
+                    <li><strong>Make sure you sign up for an AM class and a PM class.</strong></li>
+                </ul>
+            </div>
+
+            <h2>👩‍🏫 Meet Your Teachers</h2>
+            <div style="margin: 1rem 0;">
+                <img src="niecy.jpg" alt="Miss Westmoreland (Niecy)" style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%; display: block; margin: 0 auto 1rem;">
+                <p><strong>Miss Westmoreland (Niecy)</strong> - Arizona 3rd & 4th grade teacher for 9+ years, tech guru, curriculum writer, nerd whisperer, maker, and owner of light-up shoes.</p>
+            </div>
+            <div style="margin: 1rem 0;">
+                <img src="garrett.jpg" alt="Garrett Lamb" style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%; display: block; margin: 0 auto 1rem;">
+                <p><strong>Garrett Lamb</strong> - Nerding teacher for 3 years and kids love him! ASU graduate, basketball coach, and comes from a family of teachers.</p>
+            </div>
+
+            <h2>📍 Location</h2>
+            <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin: 1rem 0;">
+                <p style="font-size: 1.1rem; margin-bottom: 1rem;"><strong>331 S Cooper Rd, Gilbert, AZ 85233</strong></p>
+                <p style="color: #666; margin-bottom: 1rem;">On Cooper between Warner and Elliot</p>
+                <div style="border-radius: 8px; overflow: hidden; margin-top: 1rem;">
+                    <a href="https://maps.google.com/?q=331+S+Cooper+Rd,+Gilbert,+AZ+85233" target="_blank">
+                        <img src="images/map-location.jpg" alt="Map to Nerding location - on Cooper between Warner and Elliot" style="width: 100%; height: auto; display: block; border-radius: 8px;">
+                    </a>
+                </div>
+                <p style="text-align: center; margin-top: 0.5rem; font-size: 0.85rem; color: #888;">Click map for directions</p>
+            </div>
+
+            <h2>🎉 Friday Parent Showcase</h2>
+            <p><strong>3D Printing:</strong> See your nerd's creations and hear about their design process!</p>
+            <p><strong>Escape:</strong> Work together with your nerd to unlock puzzle boxes with various locks!</p>
+            <p><strong>Space Explorers:</strong> Witness your little astronaut's mission finale and celebrate their space exploration journey!</p>
+            <p><em>(Last 45 minutes of class on Friday, March 13)</em></p>
+
+            <div class="discount-box">
+                <h2 style="color: white; border: none; margin-top: 0;">💰 SPECIAL EARLY BIRD DISCOUNT!</h2>
+                <p>Regular Price: <span style="text-decoration: line-through;">$225</span> per half-day class</p>
+                <div class="price">YOUR Price: $199</div>
+                <p style="margin-top: 1rem; font-size: 1.1rem; background: rgba(255,255,255,0.2); padding: 0.75rem; border-radius: 5px;">🎟️ Use code: <strong style="font-size: 1.2rem;">SPRINGBREAK26</strong></p>
+                <p style="margin-top: 1rem;">💳 <strong>ESA Eligible:</strong> Yes! Use your ESA funds for Nerding classes.</p>
+            </div>
+
+            <h2>📝 We Need Your Input! (Survey)</h2>
+            
+            <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;">
+                <p style="margin: 0 0 1rem 0;"><strong>🎯 Why we need survey responses:</strong></p>
+                <p style="margin: 0;">Your responses help us decide how many classrooms to rent! Based on interest, we'll either offer:</p>
+                <ul style="margin: 1rem 0 0 1.5rem;">
+                    <li><strong>1 classroom:</strong> One morning class (9am-12pm) + one afternoon class (1-4pm)</li>
+                    <li><strong>2 classrooms:</strong> Two morning classes + two afternoon classes (more options!)</li>
+                </ul>
+            </div>
+
+            <p>Please fill out this quick 2-minute survey so we can plan:</p>
+
+            <div style="text-align: center; margin: 2rem 0;">
+                <a href="https://forms.gle/PxLKixGrWzTQ5DxA9" class="cta-button">📝 TAKE THE SURVEY</a>
+            </div>
+
+            <p><strong>Tell us:</strong></p>
+            <ul>
+                <li>Which class(es) interest you</li>
+                <li>What times work best (morning, afternoon, or all-day)</li>
+                <li>Your student's grade level(s)</li>
+                <li>Any questions you have</li>
+            </ul>
+
+            <h2>📅 Timeline</h2>
+            <ol style="margin-left: 2rem;">
+                <li><strong>NOW:</strong> Fill out the survey!</li>
+                <li><strong>This Weekend:</strong> Registration opens! (We'll email you the link)</li>
+                <li><strong>Based on survey:</strong> We'll confirm 1 or 2 classrooms</li>
+                <li><strong>March 9-13:</strong> Spring break STEM camp!</li>
+            </ol>
+
+            <h2>🌟 What Makes Nerding Special?</h2>
+            <ul>
+                <li><strong>Certified, experienced teachers</strong> (not just tech enthusiasts - actual professional educators!)</li>
+                <li><strong>Small class sizes</strong> for personalized attention</li>
+                <li><strong>Engaging curriculum</strong> developed by teachers who know kids</li>
+                <li><strong>Modern technology</strong> - 3D printers, maker tools, and more</li>
+                <li><strong>Safe, professional, FUN</strong> environment</li>
+                <li><strong>Low student-to-teacher ratio</strong></li>
+            </ul>
+
+            <p style="margin-top: 2rem; text-align: center; font-size: 1.1rem;">Let's make spring break an adventure in learning! 🚀</p>
+
+            <div style="text-align: center; margin: 2rem 0;">
+                <a href="https://forms.gle/PxLKixGrWzTQ5DxA9" class="cta-button">Fill out the survey now!</a>
+            </div>
+
+            <p style="text-align: center; margin-top: 2rem;">See you in March!</p>
+
+            <p style="margin-top: 2rem;"><strong>Niecy & Garrett</strong><br>
+            <strong>Nerding</strong><br>
+            <em>STEM classes for curious, creative, and inventive nerds</em></p>
+
+            <p style="font-size: 0.9rem; font-style: italic; margin-top: 2rem;">P.S. All survey responses are private and go straight to us (Niecy reads them personally!). We're real humans who care about making this amazing for your kids!</p>
+        </div>
+
+        <div style="background: #f8f9fa; padding: 1rem; margin-top: 2rem; text-align: center; font-size: 0.9rem; color: #666; border-radius: 5px;">
+            <p><strong>Nerding</strong> | nerding.org | Based in the Arizona East Valley</p>
+            <p style="margin-top: 0.5rem;">Science • Technology • Engineering • Making</p>
+            <p>After-school & summer STEM classes for grades 1-7</p>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('navMenu');
+            const overlay = document.getElementById('overlay');
+            menu.classList.toggle('open');
+            overlay.classList.toggle('show');
+        }
+    </script>
+</body>
+</html>
